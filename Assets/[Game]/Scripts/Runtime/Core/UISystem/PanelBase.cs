@@ -34,7 +34,7 @@ namespace Runtime.Core
 
         public void Dispose()
         {
-            UIManager.Instance.RemovePanel(panelId);
+            UIManager.Instance?.RemovePanel(panelId);
         }
 
         private void SetPanelVisibility(bool visible)
