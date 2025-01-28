@@ -6,6 +6,17 @@ namespace Runtime.Core
     {
         [SerializeField] private CanvasGroup canvasGroup;
         [SerializeField] private PanelIds panelId;
+
+        private void Start()
+        {
+            Initialize();
+        }
+
+        private void OnDisable()
+        {
+            Dispose();
+        }
+
         public void Initialize()
         {
             UIManager.Instance.AddPanel(panelId, this);
