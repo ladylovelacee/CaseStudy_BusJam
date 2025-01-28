@@ -19,6 +19,7 @@ namespace Runtime.Core
         {
             if (!IsLevelStarted) return;
             IsLevelStarted = false;
+            print(isSuccess);
         }
     }
 }

@@ -68,7 +68,7 @@ namespace Runtime.Gameplay
                     break;
             }
 
-            // TODO: Invoke timesup event
+            LevelManager.Instance.CompleteLevel(false);
         }
 
         private void UpdateTimerUI()
