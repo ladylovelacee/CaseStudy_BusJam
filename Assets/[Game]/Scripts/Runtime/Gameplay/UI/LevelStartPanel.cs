@@ -1,5 +1,4 @@
 using Runtime.Core;
-using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace Runtime.Gameplay
@@ -8,7 +7,8 @@ namespace Runtime.Gameplay
     {
         public void OnPointerClick(PointerEventData eventData)
         {
-            Debug.Log("level start");
+            LevelManager.Instance.StartLevel();
+            ClosePanel();
         }
     }
 }
