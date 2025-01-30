@@ -1,4 +1,3 @@
-using UnityEngine;
 using Unity.Mathematics;
 using Unity.Collections;
 using Unity.Jobs;
@@ -6,7 +5,7 @@ using Unity.Burst;
 
 namespace Runtime.Gameplay
 {
-    public class Pathfinding : MonoBehaviour
+    public class Pathfinding
     {
         private const int MOVE_STRAIGHT_COST = 10;
         private const int MOVE_DIAGONAL_COST = 14;
