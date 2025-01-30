@@ -10,6 +10,7 @@ namespace Runtime.Gameplay
         [SerializeField]
         private VehicleBase vehiclePrefab;
         private VehicleSpawner _spawner;
+        public VehicleBase CurrentVehicle { get; private set; }
         private void OnEnable()
         {
             LevelManager.Instance.OnLevelStarted += onLevelStarted;
