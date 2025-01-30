@@ -27,6 +27,7 @@ namespace Runtime.Gameplay
             _spawner.Spawn(ColorIDs.Green, targetPoints[0]);
         }
 
+        public bool CanPassengerBoard(PassengerBase passenger)=> passenger.PassengerColor.Equals(CurrentVehicle.ColorID) && !CurrentVehicle.IsFull;
         private void OnDrawGizmos()
         {
             if (targetPoints == null || targetPoints.Length == 0) return;

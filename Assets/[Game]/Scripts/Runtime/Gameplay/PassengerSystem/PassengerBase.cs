@@ -25,6 +25,7 @@ namespace Runtime.Gameplay
         public void Select()
         {
             Debug.Log("Selected");
+            PassengerManager.Instance.HandlePassengerSelection(this);
         }
 
         public void SetPassengerSelectable(bool state)
@@ -43,9 +44,9 @@ namespace Runtime.Gameplay
     public struct PassengerColor
     {
         private PassengerBase _base;
-        public PassengerColor(PassengerBase renderer)
+        public PassengerColor(PassengerBase passenger)
         {
-            _base = renderer;
+            _base = passenger;
         }
 
         public void SetColor(Color color) 

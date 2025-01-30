@@ -1,4 +1,5 @@
 using Runtime.Core;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,10 +7,15 @@ namespace Runtime.Gameplay
 {
     public class PassengerManager : Singleton<PassengerManager>
     {
+        public event Action<PassengerBase> OnPassengerBoarded;
+        public event Action<PassengerBase> OnPassengerMovedToWaitingArea;
+
         private List<PassengerBase> _passengers = new();
         private Dictionary<int, PassengerBase> _passengerDic = new();
         private int _index;
         private GridManager GridManager => GridManager.Instance;
+        private int waitingAreaSlots = 3;
+        private int currentWaitingCount = 0;
 
         private void Start()
         {
@@ -41,6 +47,36 @@ namespace Runtime.Gameplay
             if(y == 1) // TODO: set 1 to board height
                 passenger.SetPassengerSelectable(true);
             _index++;
+        }
+
+        public void HandlePassengerSelection(PassengerBase passenger)
+        {
+            if (CanBoardVehicle(passenger))
+            {
+                BoardPassenger(passenger);
+            }
+            else if (currentWaitingCount < waitingAreaSlots)
+            {
+                MoveToWaitingArea(passenger);
+            }
+            else
+            {
+                LevelManager.Instance.CompleteLevel(false);
+            }
+        }
+
+        private bool CanBoardVehicle(PassengerBase passenger)=> VehicleManager.Instance.CanPassengerBoard(passenger);
+
+        private void BoardPassenger(PassengerBase passenger)
+        {
+            Debug.Log($"{passenger.name} boarded the bus!");
+            OnPassengerBoarded?.Invoke(passenger);
+        }
+
+        private void MoveToWaitingArea(PassengerBase passenger)
+        {
+            currentWaitingCount++;
+            OnPassengerMovedToWaitingArea?.Invoke(passenger);
         }
     }
 }
