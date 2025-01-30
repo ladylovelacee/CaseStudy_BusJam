@@ -2,10 +2,12 @@ using UnityEngine;
 
 namespace Runtime.Gameplay
 {
-    public class PassengerBase : MonoBehaviour
+    public class PassengerBase : MonoBehaviour, ISelectable
     {
         [field: SerializeField] public Renderer Renderer { get; private set; }
         public PassengerColor PassengerColor { get; private set; }
+
+        public bool IsSelectable { get; private set; } = false;
 
         private ColorIDs _colorId;
 
@@ -19,6 +21,23 @@ namespace Runtime.Gameplay
             _colorId = colorId;
             PassengerColor.SetColor(DataManager.Instance.ColorContainer.GetColorById(colorId));
         }
+
+        public void Select()
+        {
+            Debug.Log("Selected");
+        }
+
+        public void SetPassengerSelectable(bool state)
+        {
+            IsSelectable = state;
+            // TODO: Outline process
+        }
+    }
+
+    public interface ISelectable
+    {
+        bool IsSelectable {  get; }
+        void Select();
     }
 
     public struct PassengerColor
