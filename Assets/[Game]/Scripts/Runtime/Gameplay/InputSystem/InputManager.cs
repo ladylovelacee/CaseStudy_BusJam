@@ -1,9 +1,10 @@
+using Runtime.Core;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 namespace Runtime.Gameplay
 {
-    public class InputManager : MonoBehaviour
+    public class InputManager : Singleton<InputManager>
     {
         private TouchControls touchControls;
         public TouchControls TouchControls => touchControls ??= new TouchControls();
@@ -21,31 +22,13 @@ namespace Runtime.Gameplay
         private void OnEnable()
         {
             TouchControls.Enable();
-
-            TouchControls.Touch.TouchPress.started += StartTouch;
-            TouchControls.Touch.TouchPress.canceled += EndTouch;
             TouchControls.Touch.TouchPosition.performed += HandleFingerPosition;
         }
 
         private void OnDisable()
         {
             TouchControls.Disable();
-
-            TouchControls.Touch.TouchPress.started -= StartTouch;
-            TouchControls.Touch.TouchPress.canceled -= EndTouch;
             TouchControls.Touch.TouchPosition.performed -= HandleFingerPosition;
-        }
-
-        private void StartTouch(InputAction.CallbackContext context)
-        {
-            IsFingerDown = true;
-            //Publish(CustomManagerEvents.OnFingerDown, TouchControls.Touch.TouchPosition.ReadValue<Vector2>());
-        }
-
-        private void EndTouch(InputAction.CallbackContext context)
-        {
-            IsFingerDown = false;
-            //Publish(CustomManagerEvents.OnFingerUp, TouchControls.Touch.TouchPosition.ReadValue<Vector2>());
         }
 
         private void HandleFingerPosition(InputAction.CallbackContext context)
