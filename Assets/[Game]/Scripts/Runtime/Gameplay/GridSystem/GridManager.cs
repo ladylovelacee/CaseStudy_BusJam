@@ -1,3 +1,4 @@
+
 using Runtime.Core;
 using Unity.Mathematics;
 using UnityEngine;
@@ -8,7 +9,7 @@ namespace Runtime.Gameplay
     {
         public GridSystem<GridCell> Board { get; private set; }
         private float cellSize = 1;
-        private Vector3 originPosition = Vector3.zero;
+        private Vector3 originPosition;
         public int width = 10, height = 10;
 
         public int[] walkableArea;
@@ -18,8 +19,9 @@ namespace Runtime.Gameplay
         }
         public void Initialize()
         {
+            originPosition = new Vector3(-width/2f, 0, -height/2f);
             walkableArea = new int[width * height];
-            Board = new(width, height, 1, Vector3.zero, (int x, int y) => CreateCell(x,y)); // TODO: Pool integration
+            Board = new(width, height, 1,originPosition, (int x, int y) => CreateCell(x,y)); // TODO: Pool integration
 
         }
 
