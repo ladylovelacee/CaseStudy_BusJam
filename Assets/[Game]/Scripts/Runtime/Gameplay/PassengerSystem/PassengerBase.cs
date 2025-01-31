@@ -24,7 +24,7 @@ namespace Runtime.Gameplay
 
         public void Select()
         {
-            Debug.Log("Selected");
+            SetPassengerSelectable(false);
             PassengerManager.Instance.HandlePassengerSelection(this);
         }
 
