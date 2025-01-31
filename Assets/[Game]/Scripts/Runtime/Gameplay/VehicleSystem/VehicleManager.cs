@@ -16,7 +16,7 @@ namespace Runtime.Gameplay
         private VehicleBase vehicleInstance => DataManager.Instance.InstanceContainer.Vehicle;
         private Queue<VehicleData> busQueue = new Queue<VehicleData>();
 
-        private void Awake()
+        private void Start()
         {
             InitializeBusQueue();
             onLevelStarted();
