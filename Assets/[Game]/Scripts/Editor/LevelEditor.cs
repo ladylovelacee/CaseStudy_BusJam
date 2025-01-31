@@ -50,7 +50,7 @@ public class LevelEditor : EditorWindow
 
         if (GUILayout.Button("Add Bus"))
         {
-            levelData.busQueue.Add(new VehicleData { colorId = Color.white, arrivalOrder = levelData.busQueue.Count + 1 });
+            levelData.busQueue.Add(new VehicleData { colorId = ColorIDs.White, arrivalOrder = levelData.busQueue.Count + 1 });
             EditorUtility.SetDirty(levelData);
         }
 
@@ -58,13 +58,13 @@ public class LevelEditor : EditorWindow
         {
             GUILayout.BeginHorizontal();
 
-            // Otobüs rengi seçme
-            levelData.busQueue[i].colorId = EditorGUILayout.ColorField(levelData.busQueue[i].colorId, GUILayout.Width(50));
+            // Choose bus color
+            levelData.busQueue[i].colorId = (ColorIDs)EditorGUILayout.EnumPopup(levelData.busQueue[i].colorId);
 
-            // Sýra numarasý gösterme
+            // Show order count
             GUILayout.Label($"Order: {levelData.busQueue[i].arrivalOrder}");
 
-            // Otobüsü silme butonu
+            // Remove the bus button
             if (GUILayout.Button("Remove"))
             {
                 levelData.busQueue.RemoveAt(i);
@@ -103,7 +103,7 @@ public class LevelEditor : EditorWindow
 
     private void AddStickman(int x, int y)
     {
-        levelData.stickmen.Add(new StickmanData { position = new Vector2Int(x, y), stickmanColor = Color.blue });
+        levelData.stickmen.Add(new StickmanData { position = new Vector2Int(x, y), stickmanColor = ColorIDs.Blue });
         EditorUtility.SetDirty(levelData);
     }
 
