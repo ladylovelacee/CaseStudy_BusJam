@@ -14,9 +14,8 @@ namespace Runtime.Gameplay
         {
             foreach (var c in _colors)
             {
-                _colorsDic[c.Id] = c.Color;
+                _colorsDic.Add(c.Id, c.Color);
             }
-            _colors.Clear();
         }
 
         public Color GetColorById(ColorIDs id) => _colorsDic[id];
@@ -26,6 +25,6 @@ namespace Runtime.Gameplay
     public class ColorData
     {
         [field: SerializeField] public ColorIDs Id {  get; private set; }
-        [field:SerializeField] public Color Color { get; private set; }
+        [field: SerializeField] public Color Color { get; private set; } = Color.white;
     }
 }
