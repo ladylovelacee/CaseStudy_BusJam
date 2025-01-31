@@ -1,70 +1,59 @@
 using Runtime.Core;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Runtime.Gameplay
 {
     public class VehicleManager : Singleton<VehicleManager>
     {
-        [SerializeField]
-        public Vector2[] targetPoints = new Vector2[3]; // Spawn, waiting, finish points
-        [SerializeField]
-        private VehicleBase vehiclePrefab;
-        private VehicleSpawner _spawner;
-        public VehicleBase CurrentVehicle { get; set; }
-        private void OnEnable()
+        [field:SerializeField] public Transform WaitPoint { get; private set; }
+
+        public LevelData levelData; // TODO: Get level data from level manager
+        public VehicleBase CurrentVehicle { get; private set; }
+        
+        [SerializeField] private Transform spawnPoint;
+
+        private VehicleBase vehicleInstance => DataManager.Instance.InstanceContainer.Vehicle;
+        private Queue<VehicleData> busQueue = new Queue<VehicleData>();
+
+        private void Awake()
         {
-            LevelManager.Instance.OnLevelStarted += onLevelStarted;
+            InitializeBusQueue();
+            onLevelStarted();
         }
 
-        private void OnDisable()
+        private void InitializeBusQueue()
         {
-            LevelManager.Instance.OnLevelStarted -= onLevelStarted;
+            foreach (VehicleData bus in levelData.busQueue)
+            {
+                busQueue.Enqueue(bus);
+            }
         }
 
         private void onLevelStarted() //TODO: Move to on game start
         {
-            _spawner = new(3, vehiclePrefab);
-            _spawner.Spawn(ColorIDs.Green, targetPoints[0]);
+            SpawnNextVehicle();
+        }
+
+        private void SpawnNextVehicle()
+        {
+            if (busQueue.Count > 0)
+            {
+                VehicleData nextBus = busQueue.Dequeue();
+                CurrentVehicle = Instantiate(vehicleInstance, spawnPoint.position, Quaternion.identity);
+                CurrentVehicle.Initialize(nextBus.colorId);
+            }
         }
 
         public bool CanPassengerBoard(PassengerBase passenger)=> passenger.PassengerColor.Equals(CurrentVehicle.ColorID) && !CurrentVehicle.IsFull;
-        private void OnDrawGizmos()
+        public void OnBusFilled()
         {
-            if (targetPoints == null || targetPoints.Length == 0) return;
-
-            for (int i = 0; i < targetPoints.Length; i++)
+            if (CurrentVehicle != null)
             {
-                if (targetPoints[i] == null) continue;
-                
-                Gizmos.color = Color.red;
-                Gizmos.DrawSphere(targetPoints[i], 2f);
-
-                if (i < targetPoints.Length - 1 && targetPoints[i + 1] != null)
-                {
-                    Gizmos.color = Color.white;
-                    Gizmos.DrawLine(targetPoints[i], targetPoints[i + 1]);
-                }
+                Destroy(CurrentVehicle); // TODO: Move to out of screen
+                CurrentVehicle = null;
+                SpawnNextVehicle(); // Yeni otobüsü getir
             }
-        }
-    }
-
-    public class  VehicleSpawner
-    {
-        private int _totalVehicle;
-        private VehicleBase _vehicle;
-
-        public VehicleSpawner(int totalVehicle, VehicleBase vehicle)
-        {
-            _totalVehicle = totalVehicle;
-            _vehicle = vehicle;
-        }
-
-        public void Spawn(ColorIDs color, Vector3 spawnPoint)
-        {
-            VehicleBase instance = MonoBehaviour.Instantiate(_vehicle, spawnPoint, Quaternion.identity); // TODO: Get from pool
-            instance.Initialize(color);
-
-            VehicleManager.Instance.CurrentVehicle = instance;
         }
     }
 }
