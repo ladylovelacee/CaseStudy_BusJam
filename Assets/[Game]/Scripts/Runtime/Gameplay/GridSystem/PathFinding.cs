@@ -169,12 +169,7 @@ namespace Runtime.Gameplay
 
             private void CalculatePath(NativeArray<PathNode> pathNodeArray, PathNode endNode)
             {
-                if (endNode.cameFromNodeIndex == -1)
-                {
-                    // Couldn't find a path!
-
-                }
-                else
+                if (endNode.cameFromNodeIndex != -1)
                 {
                     findedPath.Add(new int2(endNode.x, endNode.y));
 
@@ -184,8 +179,6 @@ namespace Runtime.Gameplay
                         PathNode cameFromNode = pathNodeArray[currentNode.cameFromNodeIndex];
                         findedPath.Add(new int2(cameFromNode.x, cameFromNode.y));
                         currentNode = cameFromNode;
-
-                        Debug.Log(currentNode.x+ "," + currentNode.y);
                     }
                 }
             }
