@@ -2,6 +2,8 @@ using Unity.Mathematics;
 using Unity.Collections;
 using Unity.Jobs;
 using Unity.Burst;
+using System;
+using UnityEngine;
 
 namespace Runtime.Gameplay
 {
@@ -10,52 +12,19 @@ namespace Runtime.Gameplay
         private const int MOVE_STRAIGHT_COST = 10;
         private const int MOVE_DIAGONAL_COST = 14;
 
-        public static JobHandle FindPath(int[,] walkable, int2 gridSize, int2 start, int2 end, out NativeList<int2> path)
+        public static JobHandle FindPath(int2 gridSize, int2 start, int2 end, out NativeList<int2> path)
         {
-            path = new NativeList<int2>(Allocator.TempJob);
-
-            NativeArray<PathNode> nodes = new NativeArray<PathNode>(gridSize.x * gridSize.y, Allocator.TempJob);
-            for (int x = 0; x < gridSize.x; x++)
-            {
-                for (int y = 0; y < gridSize.y; y++)
-                {
-                    PathNode pathNode = new PathNode();
-                    pathNode.x = x;
-                    pathNode.y = y;
-
-                    pathNode.gCost = int.MaxValue;
-                    pathNode.hCost = CalculateDistanceCost(new int2(x, y), end);
-                    pathNode.CalculateFCost();
-                    pathNode.index = CalculateIndex(x, y, gridSize.x);
-
-                    pathNode.isWalkable = walkable[x,y] == 1 ? true : false;
-                    pathNode.cameFromNodeIndex = -1;
-                    nodes[pathNode.index] = pathNode;
-                }
-            }
+            path = new NativeList<int2>(Allocator.Persistent);
 
             FindPathJob job = new FindPathJob
             {
                 startPosition = start,
                 endPosition = end,
                 gridSize = gridSize,
-                path = new NativeList<int2>(Allocator.TempJob),
-                pathNodeArray = nodes
+                findedPath = path
             };
 
             return job.Schedule();
-        }
-        public static int CalculateIndex(int x, int y, int gridWidth)
-        {
-            return x + y * gridWidth;
-        }
-
-        public static int CalculateDistanceCost(int2 aPosition, int2 bPosition)
-        {
-            int xDistance = math.abs(aPosition.x - bPosition.x);
-            int yDistance = math.abs(aPosition.y - bPosition.y);
-            int remaining = math.abs(xDistance - yDistance);
-            return MOVE_DIAGONAL_COST * math.min(xDistance, yDistance) + MOVE_STRAIGHT_COST * remaining;
         }
 
         [BurstCompile]
@@ -64,11 +33,31 @@ namespace Runtime.Gameplay
             public int2 startPosition;
             public int2 endPosition;
             public int2 gridSize;
-            public NativeArray<PathNode> pathNodeArray;
-            public NativeList<int2> path;
-
+            public NativeList<int2> findedPath;
             public void Execute()
             {
+                NativeArray<PathNode> pathNodeArray = new NativeArray<PathNode>(gridSize.x * gridSize.y, Allocator.Temp);
+
+                for (int x = 0; x < gridSize.x; x++)
+                {
+                    for (int y = 0; y < gridSize.y; y++)
+                    {
+                        PathNode pathNode = new PathNode();
+                        pathNode.x = x;
+                        pathNode.y = y;
+                        pathNode.index = CalculateIndex(x, y, gridSize.x);
+
+                        pathNode.gCost = int.MaxValue;
+                        pathNode.hCost = CalculateDistanceCost(new int2(x, y), endPosition);
+                        pathNode.CalculateFCost();
+
+                        pathNode.isWalkable = GridManager.Instance.walkableArea[pathNode.index] == 1 ? true : false;
+                        pathNode.cameFromNodeIndex = -1;
+                        pathNodeArray[pathNode.index] = pathNode;
+
+                    }
+                }
+
                 NativeArray<int2> neighbourOffsetArray = new NativeArray<int2>(4, Allocator.Temp);
                 neighbourOffsetArray[0] = new int2(-1, 0); // Left
                 neighbourOffsetArray[1] = new int2(+1, 0); // Right
@@ -153,50 +142,51 @@ namespace Runtime.Gameplay
                             }
                         }
 
+
                     }
+
                 }
 
                 PathNode endNode = pathNodeArray[endNodeIndex];
                 if (endNode.cameFromNodeIndex == -1)
                 {
                     // Didn't find a path!
-                    //Debug.Log("Didn't find a path!");
+                    Debug.Log("Didn't find a path!");
                 }
                 else
                 {
                     // Found a path
-                    path = CalculatePath(pathNodeArray, endNode);
+                    Debug.Log(" Found a path!");
+
+                    CalculatePath(pathNodeArray, endNode);
                 }
 
-                path.Dispose();
                 pathNodeArray.Dispose();
                 neighbourOffsetArray.Dispose();
                 openList.Dispose();
                 closedList.Dispose();
             }
 
-            private NativeList<int2> CalculatePath(NativeArray<PathNode> pathNodeArray, PathNode endNode)
+            private void CalculatePath(NativeArray<PathNode> pathNodeArray, PathNode endNode)
             {
                 if (endNode.cameFromNodeIndex == -1)
                 {
                     // Couldn't find a path!
-                    return new NativeList<int2>(Allocator.Temp);
+
                 }
                 else
                 {
-                    // Found a path
-                    NativeList<int2> path = new NativeList<int2>(Allocator.Temp);
-                    path.Add(new int2(endNode.x, endNode.y));
+                    findedPath.Add(new int2(endNode.x, endNode.y));
 
                     PathNode currentNode = endNode;
                     while (currentNode.cameFromNodeIndex != -1)
                     {
                         PathNode cameFromNode = pathNodeArray[currentNode.cameFromNodeIndex];
-                        path.Add(new int2(cameFromNode.x, cameFromNode.y));
+                        findedPath.Add(new int2(cameFromNode.x, cameFromNode.y));
                         currentNode = cameFromNode;
-                    }
 
-                    return path;
+                        Debug.Log(currentNode.x+ "," + currentNode.y);
+                    }
                 }
             }
 
@@ -224,6 +214,18 @@ namespace Runtime.Gameplay
                 return lowestCostPathNode.index;
             }
 
+            private int CalculateIndex(int x, int y, int gridWidth)
+            {
+                return x + y * gridWidth;
+            }
+
+            private int CalculateDistanceCost(int2 aPosition, int2 bPosition)
+            {
+                int xDistance = math.abs(aPosition.x - bPosition.x);
+                int yDistance = math.abs(aPosition.y - bPosition.y);
+                int remaining = math.abs(xDistance - yDistance);
+                return MOVE_DIAGONAL_COST * math.min(xDistance, yDistance) + MOVE_STRAIGHT_COST * remaining;
+            }
 
         }
     }

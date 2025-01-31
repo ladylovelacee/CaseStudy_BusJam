@@ -27,15 +27,10 @@ namespace Runtime.Gameplay
             }
         }
 
-        public int GetIndex(int x, int y) => IsValidGridPosition(x, y) ? x + (y * width) : -1;
         public void GetXYFromIndex(int index, out int x, out int y)
         {
             x = index % width;
             y = index / width;
-        }
-        public bool IsValidGridPosition(int x, int y)
-        {
-            return x >= 0 && y >= 0 && x < width && y < height;
         }
     }
 }

@@ -10,7 +10,7 @@ namespace Runtime.Gameplay
         [SerializeField]
         private VehicleBase vehiclePrefab;
         private VehicleSpawner _spawner;
-        public VehicleBase CurrentVehicle { get; private set; }
+        public VehicleBase CurrentVehicle { get; set; }
         private void OnEnable()
         {
             LevelManager.Instance.OnLevelStarted += onLevelStarted;
@@ -63,6 +63,8 @@ namespace Runtime.Gameplay
         {
             VehicleBase instance = MonoBehaviour.Instantiate(_vehicle, spawnPoint, Quaternion.identity); // TODO: Get from pool
             instance.Initialize(color);
+
+            VehicleManager.Instance.CurrentVehicle = instance;
         }
     }
 }

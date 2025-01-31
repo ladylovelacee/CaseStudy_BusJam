@@ -1,4 +1,5 @@
 using Runtime.Core;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace Runtime.Gameplay
@@ -8,13 +9,16 @@ namespace Runtime.Gameplay
         public GridSystem<GridCell> Board { get; private set; }
         private float cellSize = 1;
         private Vector3 originPosition = Vector3.zero;
-        private int width = 10, height = 10;
+        public int width = 10, height = 10;
+
+        public int[] walkableArea;
         private void Awake()
         {
             Initialize();
         }
         public void Initialize()
         {
+            walkableArea = new int[width * height];
             Board = new(width, height, 1, Vector3.zero, (int x, int y) => CreateCell(x,y)); // TODO: Pool integration
 
         }
@@ -24,7 +28,12 @@ namespace Runtime.Gameplay
             x = Mathf.FloorToInt((worldPosition - originPosition).x / cellSize);
             y = Mathf.FloorToInt((worldPosition - originPosition).z / cellSize);
         }
+        public int GetIndex(int x, int y, int width, int height) => IsValidGridPosition(x, y, width, height) ? x + (y * width) : -1;
 
+        public bool IsValidGridPosition(int x, int y, int width, int height)
+        {
+            return x >= 0 && y >= 0 && x < width && y < height;
+        }
         public Vector3 GetWorldPosition(int x, int y)
         {
             return new Vector3(x, 0, y) * cellSize + originPosition;
@@ -35,7 +44,7 @@ namespace Runtime.Gameplay
             GridCell cell = Instantiate(DataManager.Instance.InstanceContainer.Cell, GetWorldPosition(x, y), Quaternion.identity);
             cell.x = x;
             cell.y = y;
-
+            walkableArea[GetIndex(x,y, width, height)] = 1;
             return cell;
         }
     }
