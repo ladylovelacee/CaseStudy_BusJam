@@ -141,25 +141,12 @@ namespace Runtime.Gameplay
                                 openList.Add(neighbourNode.index);
                             }
                         }
-
-
                     }
-
                 }
 
                 PathNode endNode = pathNodeArray[endNodeIndex];
-                if (endNode.cameFromNodeIndex == -1)
-                {
-                    // Didn't find a path!
-                    Debug.Log("Didn't find a path!");
-                }
-                else
-                {
-                    // Found a path
-                    Debug.Log(" Found a path!");
-
+                if(endNode.cameFromNodeIndex != -1)
                     CalculatePath(pathNodeArray, endNode);
-                }
 
                 pathNodeArray.Dispose();
                 neighbourOffsetArray.Dispose();
@@ -169,17 +156,14 @@ namespace Runtime.Gameplay
 
             private void CalculatePath(NativeArray<PathNode> pathNodeArray, PathNode endNode)
             {
-                if (endNode.cameFromNodeIndex != -1)
-                {
-                    findedPath.Add(new int2(endNode.x, endNode.y));
+                findedPath.Add(new int2(endNode.x, endNode.y));
 
-                    PathNode currentNode = endNode;
-                    while (currentNode.cameFromNodeIndex != -1)
-                    {
-                        PathNode cameFromNode = pathNodeArray[currentNode.cameFromNodeIndex];
-                        findedPath.Add(new int2(cameFromNode.x, cameFromNode.y));
-                        currentNode = cameFromNode;
-                    }
+                PathNode currentNode = endNode;
+                while (currentNode.cameFromNodeIndex != -1)
+                {
+                    PathNode cameFromNode = pathNodeArray[currentNode.cameFromNodeIndex];
+                    findedPath.Add(new int2(cameFromNode.x, cameFromNode.y));
+                    currentNode = cameFromNode;
                 }
             }
 
