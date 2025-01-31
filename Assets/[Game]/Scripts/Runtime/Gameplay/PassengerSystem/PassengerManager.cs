@@ -27,6 +27,8 @@ namespace Runtime.Gameplay
             {
                 CreatePassenger();
             }
+
+            CheckSelectables();
         }
         public void AddPassenger(PassengerBase passenger)
         {
@@ -39,7 +41,7 @@ namespace Runtime.Gameplay
             if (!_passengers.Contains(passenger)) return;
             _passengers.Remove(passenger);
             if (_passengers.Count <= 0)
-                LevelManager.Instance.CompleteLevel(true);
+                LevelManager.Instance.CompleteLevel(true); //Can be ERROR!
         }
 
         public void CreatePassenger()
@@ -49,28 +51,19 @@ namespace Runtime.Gameplay
             PassengerBase passenger = Instantiate(DataManager.Instance.InstanceContainer.Passenger,
                 GridManager.GetWorldPosition(x,y), 
                 Quaternion.identity); // TODO: Get from pool
-            if(y == 1) // TODO: set 1 to board height
-                passenger.SetPassengerSelectable(true);
+
+            passenger.Initialize(ColorIDs.White, new(x,y)); // TODO: make color generic
+            AddPassenger(passenger);
             _index++;
         }
 
         public void HandlePassengerSelection(PassengerBase passenger)
         {
+            int index = GridManager.Instance.GetIndex(passenger.Position.x, passenger.Position.y, GridManager.Instance.width, GridManager.Instance.height);
+            passenger.transform.DOPath(FindPath(passenger.Position, passenger.TargetPos).ToArray(), 5f);
 
-            GridManager.GetGridPosition(passenger.transform.position, out int x, out int y);
-
-            JobHandle handle = Pathfinding.FindPath(new int2(GridManager.width, GridManager.height), new int2(x, y), new int2(9, 9), out NativeList<int2> path);
-            handle.Complete();
-            List<Vector3> findedPath = new();
-            //Vector3[] findedPath = new Vector3[path.Length];
-            for (int i = path.Length - 1; i>=0; i--)
-            {
-                //findedPath[i] = GridManager.GetWorldPosition(path[i].x, path[i].y);
-                findedPath.Add(GridManager.GetWorldPosition(path[i].x, path[i].y));
-            }
-            path.Dispose();
-            passenger.transform.DOPath(findedPath.ToArray(), 5f);
-
+            GridManager.Instance.walkableArea[index] = 1;
+            CheckSelectables();
             //if (CanBoardVehicle(passenger))
             //{
             //    BoardPassenger(passenger);
@@ -86,6 +79,52 @@ namespace Runtime.Gameplay
             //}
         }
 
+        #region Movement Control
+        private List<Vector3> FindPath(Vector2Int startPos,Vector2Int targetPos)
+        {
+            JobHandle handle = Pathfinding.FindPath(new int2(GridManager.width, GridManager.height), new int2(startPos.x, startPos.y), new int2(targetPos.x, targetPos.y), out NativeList<int2> path);
+            handle.Complete();
+            List<Vector3> findedPath = new();
+            for (int i = path.Length - 1; i >= 0; i--)
+            {
+                findedPath.Add(GridManager.GetWorldPosition(path[i].x, path[i].y));
+            }
+            path.Dispose();
+            return findedPath;
+        }
+
+        private bool IsPathAvailable(Vector2Int startPos, Vector2Int targetPos)
+        {
+            JobHandle handle = Pathfinding.FindPath(new int2(GridManager.width, GridManager.height), new int2(startPos.x, startPos.y), new int2(targetPos.x, targetPos.y), out NativeList<int2> path);
+            handle.Complete();
+            return path.Length == 0 ? false : true;
+        }
+        #endregion
+
+        #region Selectable Control
+        private void CheckSelectables()
+        {
+            List<PassengerBase> passengersTemp = new(_passengers);
+            for (int i = 0; passengersTemp.Count > i; i++)
+            {
+                PassengerBase passenger = _passengers[i];
+                Vector2Int passengerPos = passenger.Position;
+                if (passenger.IsSelectable)
+                    continue;
+
+                for (int j = 0; j < GridManager.width; j++)
+                {
+                    Vector2Int gridPos = new(j, GridManager.height - 1);
+                    if (IsPathAvailable(passengerPos, gridPos))
+                    {
+                        passenger.SetPassengerSelectable(true);
+                        passenger.TargetPos = gridPos;
+                        break;
+                    }
+                }
+            }
+        }
+        #endregion
         private bool CanBoardVehicle(PassengerBase passenger)=> VehicleManager.Instance.CanPassengerBoard(passenger);
 
         private void BoardPassenger(PassengerBase passenger)
