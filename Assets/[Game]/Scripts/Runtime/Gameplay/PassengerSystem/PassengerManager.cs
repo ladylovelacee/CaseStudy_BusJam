@@ -52,7 +52,7 @@ namespace Runtime.Gameplay
                 GridManager.GetWorldPosition(x,y), 
                 Quaternion.identity); // TODO: Get from pool
 
-            passenger.Initialize(ColorIDs.White, new(x,y)); // TODO: make color generic
+            passenger.Initialize(ColorIDs.Yellow, new(x,y)); // TODO: make color generic
             AddPassenger(passenger);
             _index++;
         }
@@ -60,23 +60,25 @@ namespace Runtime.Gameplay
         public void HandlePassengerSelection(PassengerBase passenger)
         {
             int index = GridManager.Instance.GetIndex(passenger.Position.x, passenger.Position.y, GridManager.Instance.width, GridManager.Instance.height);
-            passenger.transform.DOPath(FindPath(passenger.Position, passenger.TargetPos).ToArray(), 5f);
+            passenger.transform.DOPath(FindPath(passenger.Position, passenger.TargetPos).ToArray(), 2f)
+                .OnComplete(() =>
+                {
+                    if (CanBoardVehicle(passenger))
+                    {
+                        BoardPassenger(passenger);
+                    }
+                    else if (currentWaitingCount < waitingAreaSlots)
+                    {
+                        MoveToWaitingArea(passenger);
+                    }
+                    else
+                    {
+                        LevelManager.Instance.CompleteLevel(false);
+                    }
+                });
 
             GridManager.Instance.walkableArea[index] = 1;
-            CheckSelectables();
-            //if (CanBoardVehicle(passenger))
-            //{
-            //    BoardPassenger(passenger);
-
-            //}
-            //else if (currentWaitingCount < waitingAreaSlots)
-            //{
-            //    MoveToWaitingArea(passenger);
-            //}
-            //else
-            //{
-            //    LevelManager.Instance.CompleteLevel(false);
-            //}
+            CheckSelectables();           
         }
 
         #region Movement Control
@@ -129,14 +131,18 @@ namespace Runtime.Gameplay
 
         private void BoardPassenger(PassengerBase passenger)
         {
-            Debug.Log($"{passenger.name} boarded the bus!");
             OnPassengerBoarded?.Invoke(passenger);
+            passenger.transform.SetParent(VehicleManager.Instance.CurrentVehicle.transform);
+            passenger.transform.DOMove(VehicleManager.Instance.CurrentVehicle.transform.position, .5f)
+                .OnComplete(VehicleManager.Instance.CurrentVehicle.AddPassenger);
         }
 
         private void MoveToWaitingArea(PassengerBase passenger)
         {
             currentWaitingCount++;
             OnPassengerMovedToWaitingArea?.Invoke(passenger);
+            if(currentWaitingCount >= waitingAreaSlots)
+                LevelManager.Instance.CompleteLevel(false);
         }
     }
 }

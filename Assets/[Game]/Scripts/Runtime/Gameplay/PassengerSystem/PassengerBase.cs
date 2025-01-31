@@ -12,7 +12,7 @@ namespace Runtime.Gameplay
         public Vector2Int TargetPos;
         private PassengerManager Manager => PassengerManager.Instance;
 
-        private ColorIDs _colorId;
+        public ColorIDs _colorId;
 
         private void Awake()
         {

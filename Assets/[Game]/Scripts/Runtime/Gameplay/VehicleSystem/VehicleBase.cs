@@ -40,6 +40,7 @@ namespace Runtime.Gameplay
 
             if (IsFull)
             {
+                Move(Manager.FinishPoint.position);
                 Manager.OnBusFilled();
             }
         }

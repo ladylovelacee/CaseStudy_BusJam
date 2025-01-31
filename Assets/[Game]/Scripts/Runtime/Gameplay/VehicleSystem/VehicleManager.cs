@@ -7,6 +7,7 @@ namespace Runtime.Gameplay
     public class VehicleManager : Singleton<VehicleManager>
     {
         [field:SerializeField] public Transform WaitPoint { get; private set; }
+        [field:SerializeField] public Transform FinishPoint { get; private set; }
 
         public LevelData levelData; // TODO: Get level data from level manager
         public VehicleBase CurrentVehicle { get; private set; }
@@ -45,14 +46,13 @@ namespace Runtime.Gameplay
             }
         }
 
-        public bool CanPassengerBoard(PassengerBase passenger)=> passenger.PassengerColor.Equals(CurrentVehicle.ColorID) && !CurrentVehicle.IsFull;
+        public bool CanPassengerBoard(PassengerBase passenger)=> passenger._colorId.Equals(CurrentVehicle.ColorID) && !CurrentVehicle.IsFull;
         public void OnBusFilled()
         {
             if (CurrentVehicle != null)
             {
-                Destroy(CurrentVehicle); // TODO: Move to out of screen
                 CurrentVehicle = null;
-                SpawnNextVehicle(); // Yeni otobüsü getir
+                SpawnNextVehicle();
             }
         }
     }
