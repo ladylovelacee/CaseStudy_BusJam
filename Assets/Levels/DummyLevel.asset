@@ -12,9 +12,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a77fc43faffeacb4daa55b950fa6f7aa, type: 3}
   m_Name: DummyLevel
   m_EditorClassIdentifier: 
-  width: 0
-  height: 0
-  stickmen: []
+  width: 10
+  height: 10
+  stickmen:
+  - position: {x: 4, y: 9}
+    stickmanColor: 0
+    ability: 
+  - position: {x: 4, y: 7}
+    stickmanColor: 0
+    ability: 
+  - position: {x: 3, y: 0}
+    stickmanColor: 1
+    ability: 
   cabins: []
   obstacles: []
-  busQueue: []
+  busQueue:
+  - colorId: 4
+    arrivalOrder: 1
+  - colorId: 1
+    arrivalOrder: 2
