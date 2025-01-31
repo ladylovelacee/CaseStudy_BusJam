@@ -27,7 +27,7 @@ namespace Runtime.Gameplay
             return job.Schedule();
         }
 
-        [BurstCompile]
+        //[BurstCompile]
         private struct FindPathJob : IJob
         {
             public int2 startPosition;
