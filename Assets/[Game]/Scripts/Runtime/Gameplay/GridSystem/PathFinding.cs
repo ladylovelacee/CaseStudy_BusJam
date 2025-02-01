@@ -10,7 +10,7 @@ namespace Runtime.Gameplay
     public class Pathfinding
     {
         private const int MOVE_STRAIGHT_COST = 10;
-        private const int MOVE_DIAGONAL_COST = 14;
+        private const int MOVE_DIAGONAL_COST = 24;
 
         public static JobHandle FindPath(int2 gridSize, int2 start, int2 end, out NativeList<int2> path)
         {
@@ -51,7 +51,7 @@ namespace Runtime.Gameplay
                         pathNode.hCost = CalculateDistanceCost(new int2(x, y), endPosition);
                         pathNode.CalculateFCost();
 
-                        pathNode.isWalkable = GridManager.Instance.walkableArea[pathNode.index] == 1 ? true : false;
+                        pathNode.isWalkable = GridManager.Instance.WalkableArea[pathNode.index] == 1 ? true : false;
                         pathNode.cameFromNodeIndex = -1;
                         pathNodeArray[pathNode.index] = pathNode;
 

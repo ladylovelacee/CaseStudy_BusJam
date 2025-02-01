@@ -7,13 +7,13 @@ namespace Runtime.Gameplay
     {
         public ObjectPoolBase<GridCell> CellPool {  get; private set; }
         public GridSystem<GridCell> Board { get; private set; }
-
+        
         private float cellSize = 1;
         private Vector3 originPosition;
         public int width, height;
 
         [HideInInspector]
-        public int[] walkableArea;
+        public int[] WalkableArea {  get; private set; }
         private void Awake()
         {
             CellPool = new(DataManager.Instance.InstanceContainer.Cell);
@@ -23,9 +23,11 @@ namespace Runtime.Gameplay
         {
             width = data.width; 
             height = data.height;
-            
+
+            int walkableAreaSlotCount = width * height + WaitingAreaManager.MaxWaitingSlotWidth * WaitingAreaManager.MaxWaitingSlotHeight;
+            WalkableArea = new int[walkableAreaSlotCount];
+
             originPosition = new Vector3(-width/2f, 0, -height/2f);
-            walkableArea = new int[width * height];
             Board = new(width, height, originPosition, (int x, int y) => CreateCell(x,y));
         }
 
@@ -34,7 +36,7 @@ namespace Runtime.Gameplay
         public void SetCellWalkable(int x, int y, bool isWalkable)
         {
             int index = Board.GetIndex(x, y);
-            walkableArea[index] = isWalkable ? 1 : 0;
+            WalkableArea[index] = isWalkable ? 1 : 0;
         }
 
         private GridCell CreateCell(int x, int y)
@@ -44,7 +46,7 @@ namespace Runtime.Gameplay
             cell.y = y;
             cell.transform.position = GetWorldPosition(x,y);
 
-            walkableArea[x + (y * width)] = 1;
+            WalkableArea[x + (y * width)] = 1;
             return cell;
         }
     }
