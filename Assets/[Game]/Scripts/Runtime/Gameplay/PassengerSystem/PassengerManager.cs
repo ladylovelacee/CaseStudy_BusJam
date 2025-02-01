@@ -11,25 +11,41 @@ namespace Runtime.Gameplay
 {
     public class PassengerManager : Singleton<PassengerManager>
     {
+        #region Events
         public event Action<PassengerBase> OnPassengerBoarded;
         public event Action<PassengerBase> OnPassengerMovedToWaitingArea;
+        #endregion
+
+        public ObjectPoolBase<PassengerBase> PassengerPool { get; private set; }
 
         private List<PassengerBase> _passengers = new();
-        private Dictionary<int, PassengerBase> _passengerDic = new();
-        private int _index;
-        private GridManager GridManager => GridManager.Instance;
+        private BoardManager GridManager => BoardManager.Instance;
         private int waitingAreaSlots = 3;
         private int currentWaitingCount = 0;
 
+        [SerializeField] LevelData data;
+        private void Awake()
+        {
+            PassengerPool = new ObjectPoolBase<PassengerBase>(DataManager.Instance.InstanceContainer.Passenger);
+        }
+
         private void Start()
         {
-            for (int i = 0; i < 20; i++)
+            CreatePassengers(data.stickmen);
+        }
+        public void CreatePassengers(List<StickmanData> stickmen)
+        {
+            if(_passengers.Count != 0)
+                _passengers.Clear();
+
+            foreach (StickmanData stickman in stickmen)
             {
-                CreatePassenger();
+                CreatePassenger(stickman);
             }
 
             CheckSelectables();
         }
+
         public void AddPassenger(PassengerBase passenger)
         {
             if (_passengers.Contains(passenger)) return;
@@ -44,22 +60,19 @@ namespace Runtime.Gameplay
                 LevelManager.Instance.CompleteLevel(true); //Can be ERROR!
         }
 
-        public void CreatePassenger()
+        public void CreatePassenger(StickmanData stickman)
         {
-            GridManager.Board.GetXYFromIndex(_index, out int x, out int y);
-            GridManager.walkableArea[GridManager.GetIndex(x,y, GridManager.width, GridManager.height)] = 0;
-            PassengerBase passenger = Instantiate(DataManager.Instance.InstanceContainer.Passenger,
-                GridManager.GetWorldPosition(x,y), 
-                Quaternion.identity); // TODO: Get from pool
-
-            passenger.Initialize(ColorIDs.Yellow, new(x,y)); // TODO: make color generic
+            Vector3 position = GridManager.GetWorldPosition(stickman.position.x, stickman.position.y);
+            PassengerBase passenger = PassengerPool.Get();
+            passenger.transform.position = position;
+            passenger.Initialize(stickman.stickmanColor, stickman.position);
             AddPassenger(passenger);
-            _index++;
+
+            GridManager.SetCellWalkable(stickman.position.x, stickman.position.y, false);
         }
 
         public void HandlePassengerSelection(PassengerBase passenger)
         {
-            int index = GridManager.Instance.GetIndex(passenger.Position.x, passenger.Position.y, GridManager.Instance.width, GridManager.Instance.height);
             passenger.transform.DOPath(FindPath(passenger.Position, passenger.TargetPos).ToArray(), 2f)
                 .OnComplete(() =>
                 {
@@ -77,7 +90,6 @@ namespace Runtime.Gameplay
                     }
                 });
 
-            GridManager.Instance.walkableArea[index] = 1;
             CheckSelectables();           
         }
 
