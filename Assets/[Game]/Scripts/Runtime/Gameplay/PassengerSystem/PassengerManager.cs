@@ -19,7 +19,7 @@ namespace Runtime.Gameplay
         public ObjectPoolBase<PassengerBase> PassengerPool { get; private set; }
 
         private List<PassengerBase> _passengers = new();
-        private BoardManager GridManager => BoardManager.Instance;
+        private GridManager GridManager => GridManager.Instance;
         private int waitingAreaSlots = 3;
         private int currentWaitingCount = 0;
 

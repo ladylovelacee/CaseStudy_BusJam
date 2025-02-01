@@ -13,7 +13,7 @@ namespace Runtime.Gameplay
 
         void LoadLevel(LevelData levelData)
         {
-            BoardManager.Instance.Initialize(level);
+            GridManager.Instance.Initialize(level);
             PassengerManager.Instance.Initialize(level);
             VehicleManager.Instance.Initialize(level);
         }

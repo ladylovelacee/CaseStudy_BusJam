@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Runtime.Gameplay
 {
-    public class BoardManager : Singleton<BoardManager>
+    public class GridManager : Singleton<GridManager>
     {
         public ObjectPoolBase<GridCell> CellPool {  get; private set; }
         public GridSystem<GridCell> Board { get; private set; }
