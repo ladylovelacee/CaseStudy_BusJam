@@ -8,7 +8,6 @@ namespace Runtime.Gameplay
     {
         public int width, height;
         public List<StickmanData> stickmen = new();
-        public List<CabinData> cabins = new();
         public List<Vector2Int> obstacles = new();
         public List<VehicleData> busQueue = new();
     }
@@ -18,14 +17,6 @@ namespace Runtime.Gameplay
     {
         public Vector2Int position;
         public ColorIDs stickmanColor;
-        public string ability;
-    }
-
-    [System.Serializable]
-    public class CabinData
-    {
-        public Vector2Int position;
-        public List<Color> containedColors;
     }
 
     [System.Serializable]

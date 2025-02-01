@@ -82,10 +82,6 @@ public class LevelEditor : EditorWindow
             if (stickman.position == new Vector2Int(x, y))
                 return "S";
 
-        foreach (var cabin in levelData.cabins)
-            if (cabin.position == new Vector2Int(x, y))
-                return "C";
-
         if (levelData.obstacles.Contains(new Vector2Int(x, y)))
             return "X";
 
@@ -96,7 +92,6 @@ public class LevelEditor : EditorWindow
     {
         GenericMenu menu = new GenericMenu();
         menu.AddItem(new GUIContent("Add Stickman"), false, () => AddStickman(x, y));
-        menu.AddItem(new GUIContent("Add Cabin"), false, () => AddCabin(x, y));
         menu.AddItem(new GUIContent("Add Obstacle"), false, () => AddObstacle(x, y));
         menu.ShowAsContext();
     }
@@ -104,12 +99,6 @@ public class LevelEditor : EditorWindow
     private void AddStickman(int x, int y)
     {
         levelData.stickmen.Add(new StickmanData { position = new Vector2Int(x, y), stickmanColor = ColorIDs.Blue });
-        EditorUtility.SetDirty(levelData);
-    }
-
-    private void AddCabin(int x, int y)
-    {
-        levelData.cabins.Add(new CabinData { position = new Vector2Int(x, y), containedColors = new List<Color> { Color.blue, Color.red } });
         EditorUtility.SetDirty(levelData);
     }
 
