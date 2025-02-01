@@ -23,21 +23,17 @@ namespace Runtime.Gameplay
         private int waitingAreaSlots = 3;
         private int currentWaitingCount = 0;
 
-        [SerializeField] LevelData data;
         private void Awake()
         {
             PassengerPool = new ObjectPoolBase<PassengerBase>(DataManager.Instance.InstanceContainer.Passenger);
         }
 
-        private void Start()
-        {
-            CreatePassengers(data.stickmen);
-        }
-        public void CreatePassengers(List<StickmanData> stickmen)
+        public void Initialize(LevelData data)
         {
             if(_passengers.Count != 0)
                 _passengers.Clear();
 
+            List<StickmanData> stickmen = data.stickmen;
             foreach (StickmanData stickman in stickmen)
             {
                 CreatePassenger(stickman);
@@ -56,8 +52,8 @@ namespace Runtime.Gameplay
         {
             if (!_passengers.Contains(passenger)) return;
             _passengers.Remove(passenger);
-            if (_passengers.Count <= 0)
-                LevelManager.Instance.CompleteLevel(true); //Can be ERROR!
+            //if (_passengers.Count <= 0)
+            //    LevelManager.Instance.CompleteLevel(true); //Can be ERROR!
         }
 
         public void CreatePassenger(StickmanData stickman)

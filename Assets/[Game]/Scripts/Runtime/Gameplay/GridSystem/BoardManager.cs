@@ -10,7 +10,7 @@ namespace Runtime.Gameplay
 
         private float cellSize = 1;
         private Vector3 originPosition;
-        public int width = 10, height = 10;
+        public int width, height;
 
         [HideInInspector]
         public int[] walkableArea;
@@ -18,13 +18,12 @@ namespace Runtime.Gameplay
         {
             CellPool = new(DataManager.Instance.InstanceContainer.Cell);
         }
-        private void Start()
-        {
-            Initialize();
-        }
 
-        public void Initialize()
+        public void Initialize(LevelData data)
         {
+            width = data.width; 
+            height = data.height;
+            
             originPosition = new Vector3(-width/2f, 0, -height/2f);
             walkableArea = new int[width * height];
             Board = new(width, height, originPosition, (int x, int y) => CreateCell(x,y));
