@@ -10,7 +10,7 @@ namespace Runtime.Gameplay
         private float cellSize;
         private Vector3 originPosition;
 
-        public GridSystem(int width, int height, float cellSize, Vector3 originPosition, Func<int, int, T> createDefaultItem)
+        public GridSystem(int width, int height, Vector3 originPosition, Func<int, int, T> createDefaultItem, float cellSize = 1)
         {
             this.width = width;
             this.height = height;
@@ -31,6 +31,24 @@ namespace Runtime.Gameplay
         {
             x = index % width;
             y = index / width;
+        }
+
+        public bool IsValidGridPosition(int x, int y, int width, int height)
+        {
+            return x >= 0 && y >= 0 && x < width && y < height;
+        }
+
+        public int GetIndex(int x, int y, int width, int height) => IsValidGridPosition(x, y, width, height) ? x + (y * width) : -1;
+
+        public Vector3 GetWorldPosition(int x, int y)
+        {
+            return new Vector3(x, 0, y) * cellSize + originPosition;
+        }
+
+        public void GetGridPosition(Vector3 worldPosition, out int x, out int y)
+        {
+            x = Mathf.FloorToInt((worldPosition - originPosition).x / cellSize);
+            y = Mathf.FloorToInt((worldPosition - originPosition).z / cellSize);
         }
     }
 }
