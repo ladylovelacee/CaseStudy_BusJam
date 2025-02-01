@@ -30,7 +30,13 @@ namespace Runtime.Gameplay
             Board = new(width, height, originPosition, (int x, int y) => CreateCell(x,y));
         }
 
-        private Vector3 GetWorldPosition(int x, int y) => new Vector3(x, 0, y) * cellSize + originPosition;
+        public Vector3 GetWorldPosition(int x, int y) => new Vector3(x, 0, y) * cellSize + originPosition;
+
+        public void SetCellWalkable(int x, int y, bool isWalkable)
+        {
+            int index = Board.GetIndex(x, y);
+            walkableArea[index] = isWalkable ? 1 : 0;
+        }
 
         private GridCell CreateCell(int x, int y)
         {
@@ -38,6 +44,7 @@ namespace Runtime.Gameplay
             cell.x = x;
             cell.y = y;
             cell.transform.position = GetWorldPosition(x,y);
+
             walkableArea[x + (y * width)] = 1;
             return cell;
         }

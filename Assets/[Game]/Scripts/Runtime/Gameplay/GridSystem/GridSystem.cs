@@ -33,12 +33,12 @@ namespace Runtime.Gameplay
             y = index / width;
         }
 
-        public bool IsValidGridPosition(int x, int y, int width, int height)
+        public bool IsValidGridPosition(int x, int y)
         {
             return x >= 0 && y >= 0 && x < width && y < height;
         }
 
-        public int GetIndex(int x, int y, int width, int height) => IsValidGridPosition(x, y, width, height) ? x + (y * width) : -1;
+        public int GetIndex(int x, int y) => IsValidGridPosition(x, y) ? x + (y * width) : -1;
 
         public Vector3 GetWorldPosition(int x, int y)
         {
