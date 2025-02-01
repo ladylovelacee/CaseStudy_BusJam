@@ -27,7 +27,7 @@ namespace Runtime.Gameplay
         {
             originPosition = new Vector3(-width/2f, 0, -height/2f);
             walkableArea = new int[width * height];
-            Board = new(width, height, originPosition, (int x, int y) => CreateCell(x,y)); // TODO: Pool integration
+            Board = new(width, height, originPosition, (int x, int y) => CreateCell(x,y));
         }
 
         private Vector3 GetWorldPosition(int x, int y) => new Vector3(x, 0, y) * cellSize + originPosition;
