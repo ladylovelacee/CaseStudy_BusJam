@@ -6,20 +6,19 @@ namespace Runtime.Gameplay
 {
     public class PassengerBase : MonoBehaviour, ISelectable
     {
+        #region Properties
         [field: SerializeField] public Renderer Renderer { get; private set; }
-        public PassengerColor PassengerColor { get; private set; }
-        public Vector2Int Position { get; private set; }
-
         public bool IsSelectable { get; private set; } = false;
-        public Vector2Int TargetPos;
-        private PassengerManager Manager => PassengerManager.Instance;
         public StickmanData Data { get; private set; }
+        private PassengerManager Manager => PassengerManager.Instance;
+        #endregion
 
-        public ColorIDs _colorId;
+        public Vector2Int TargetBoardPos;
+        private PassengerColor _passengerColor;
 
         private void Awake()
         {
-            PassengerColor = new(this);
+            _passengerColor = new(this);
         }
 
         private void OnEnable()
@@ -29,8 +28,8 @@ namespace Runtime.Gameplay
 
         private void OnDisable()
         {
-            LevelManager.Instance.LevelLoader.OnLevelStartLoading -= onLevelStartedLoading;
             IsSelectable = false;
+            LevelManager.Instance.LevelLoader.OnLevelStartLoading -= onLevelStartedLoading;
         }
 
         private void onLevelStartedLoading()
@@ -41,14 +40,7 @@ namespace Runtime.Gameplay
         public void SetStickmanData(StickmanData data)
         {
             Data = data;
-            Initialize(data.stickmanColor, data.position);
-        }
-
-        private void Initialize(ColorIDs colorId, Vector2Int pos)
-        {
-            Position = pos;
-            _colorId = colorId;
-            PassengerColor.SetColor(DataManager.Instance.ColorContainer.GetColorById(colorId));
+            _passengerColor.SetColor(DataManager.Instance.ColorContainer.GetColorById(data.stickmanColor));
         }
 
         public void Select()
@@ -64,12 +56,6 @@ namespace Runtime.Gameplay
             IsSelectable = state;
             // TODO: Outline process
         }
-    }
-
-    public interface ISelectable
-    {
-        bool IsSelectable {  get; }
-        void Select();
     }
 
     public struct PassengerColor

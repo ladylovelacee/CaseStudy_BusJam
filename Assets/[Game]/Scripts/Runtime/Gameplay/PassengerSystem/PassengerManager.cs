@@ -17,13 +17,9 @@ namespace Runtime.Gameplay
         #endregion
 
         public ObjectPoolBase<PassengerBase> PassengerPool { get; private set; }
-
         public List<PassengerBase> Passengers { get; private set; } = new();
         private BoardManager GridManager => BoardManager.Instance;
         private WaitingAreaManager WaitingAreaManager => WaitingAreaManager.Instance;
-
-        private int waitingAreaSlots = 3;
-        private int currentWaitingCount = 0;
 
         private LevelData levelData => LevelLoader.CurrentLevelData;
 
@@ -43,7 +39,7 @@ namespace Runtime.Gameplay
             {
                 stickmen = GameplaySaveSystem.CurrentSaveData.LastStickmenDataList;
 
-                // Waiting passengers.
+                // Load waiting passengers
                 for (int i = 0; i < GameplaySaveSystem.CurrentSaveData.LastWaitingAreaStickmenDataList.Count; i++)
                 {
                     StickmanData waitingStickmanData = GameplaySaveSystem.CurrentSaveData.LastWaitingAreaStickmenDataList[i];
@@ -92,8 +88,8 @@ namespace Runtime.Gameplay
             if (WaitingAreaManager.IsFull)
                 return;
 
-            GridManager.SetCellWalkable(passenger.Position.x, passenger.Position.y, true);
-            passenger.transform.DOPath(FindPath(passenger.Position, passenger.TargetPos).ToArray(), 2f)
+            GridManager.SetCellWalkable(passenger.Data.position.x, passenger.Data.position.y, true);
+            passenger.transform.DOPath(FindPath(passenger.Data.position, passenger.TargetBoardPos).ToArray(), 2f)
                 .OnComplete(() =>
                 {
                     if (CanBoardVehicle(passenger))
@@ -134,9 +130,12 @@ namespace Runtime.Gameplay
             for (int i = 0; passengersTemp.Count > i; i++)
             {
                 PassengerBase passenger = Passengers[i];
-                Vector2Int passengerPos = passenger.Position;
+                Vector2Int passengerPos = passenger.Data.position;
                 if (passenger.IsSelectable)
                     continue;
+                if (!BoardManager.Instance.Board.IsValidGridPosition(passenger.Data.position.x, passenger.Data.position.y + 1))
+                    passenger.SetPassengerSelectable(true);
+
 
                 for (int j = 0; j < GridManager.width; j++)
                 {
@@ -144,7 +143,7 @@ namespace Runtime.Gameplay
                     if (IsPathAvailable(passengerPos, gridPos))
                     {
                         passenger.SetPassengerSelectable(true);
-                        passenger.TargetPos = gridPos;
+                        passenger.TargetBoardPos = gridPos;
                         break;
                     }
                 }
