@@ -13,23 +13,38 @@ namespace Runtime.Gameplay
         [SerializeField] private Transform spawnPoint;
 
         private VehicleBase vehicleInstance => DataManager.Instance.InstanceContainer.Vehicle;
-        private Queue<VehicleData> busQueue = new Queue<VehicleData>();
+        public Queue<VehicleData> busQueue { get; private set; } = new Queue<VehicleData>();
 
         public void Initialize(LevelData data)
         {
-            foreach (VehicleData bus in data.busQueue)
+            List<VehicleData> vehicleDatas = new();
+            if (GameplaySaveSystem.CurrentSaveData != null)
+                vehicleDatas = GameplaySaveSystem.CurrentSaveData.BusQueue;           
+            else
+                vehicleDatas = data.busQueue;
+
+            foreach (VehicleData bus in vehicleDatas)
             {
                 busQueue.Enqueue(bus);
             }
+            SpawnFirstVehicle();
+        }
 
+        private void SpawnFirstVehicle()
+        {
             SpawnNextVehicle();
+            if (GameplaySaveSystem.CurrentSaveData != null)
+            {
+                for (int i = 0; GameplaySaveSystem.CurrentSaveData.LastBusPassengerCount>i; i++) 
+                    CurrentVehicle.AddPassenger();
+            }
         }
 
         private void SpawnNextVehicle()
         {
             if (busQueue.Count > 0)
             {
-                VehicleData nextBus = busQueue.Dequeue();
+                VehicleData nextBus = busQueue.Peek();
                 CurrentVehicle = Instantiate(vehicleInstance, spawnPoint.position, Quaternion.identity);
                 CurrentVehicle.Initialize(nextBus.colorId);
             }
@@ -40,6 +55,7 @@ namespace Runtime.Gameplay
         {
             if (CurrentVehicle != null)
             {
+                busQueue.Dequeue();
                 CurrentVehicle = null;
                 SpawnNextVehicle();
             }

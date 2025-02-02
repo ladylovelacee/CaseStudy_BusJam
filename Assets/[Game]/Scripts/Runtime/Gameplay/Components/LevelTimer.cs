@@ -15,7 +15,7 @@ namespace Runtime.Gameplay
 
         private readonly WaitForSecondsRealtime _waitForSecondsRealTime = new(1);
 
-        private int _remainingSeconds;
+        public static int RemainingSeconds;
         private Coroutine _timerCoroutine;
 
         private void Awake()
@@ -35,7 +35,10 @@ namespace Runtime.Gameplay
 
         private void Initialize()
         {
-            _remainingSeconds = TimerDuration;
+            if (GameplaySaveSystem.CurrentSaveData == null)
+                RemainingSeconds = TimerDuration;
+            else
+                RemainingSeconds = GameplaySaveSystem.CurrentSaveData.LastGameTime;
             UpdateTimerUI();
         }
 
@@ -59,12 +62,12 @@ namespace Runtime.Gameplay
             {
                 yield return _waitForSecondsRealTime;
 
-                _remainingSeconds -= 1;
-                _remainingSeconds = Mathf.Max(0, _remainingSeconds);
+                RemainingSeconds -= 1;
+                RemainingSeconds = Mathf.Max(0, RemainingSeconds);
 
                 UpdateTimerUI();
 
-                if (_remainingSeconds <= 0)
+                if (RemainingSeconds <= 0)
                     break;
             }
 
@@ -73,7 +76,7 @@ namespace Runtime.Gameplay
 
         private void UpdateTimerUI()
         {
-            TimeSpan timeSpan = TimeSpan.FromSeconds(_remainingSeconds);
+            TimeSpan timeSpan = TimeSpan.FromSeconds(RemainingSeconds);
             string formattedTime = string.Format("{0:D2}:{1:D2}", timeSpan.Minutes, timeSpan.Seconds);
 
             /*
