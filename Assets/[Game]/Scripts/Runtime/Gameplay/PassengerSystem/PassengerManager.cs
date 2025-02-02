@@ -136,7 +136,6 @@ namespace Runtime.Gameplay
                 if (!BoardManager.Instance.Board.IsValidGridPosition(passenger.Data.position.x, passenger.Data.position.y + 1))
                     passenger.SetPassengerSelectable(true);
 
-
                 for (int j = 0; j < GridManager.width; j++)
                 {
                     Vector2Int gridPos = new(j, GridManager.height - 1);

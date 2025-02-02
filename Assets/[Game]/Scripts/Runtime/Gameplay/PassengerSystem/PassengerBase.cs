@@ -14,23 +14,25 @@ namespace Runtime.Gameplay
         #endregion
 
         public Vector2Int TargetBoardPos;
-        private PassengerColor _passengerColor;
+        private PassengerVisual _passengerVisual;
 
+        #region Methods From MonoBehaviour
         private void Awake()
         {
-            _passengerColor = new(this);
+            _passengerVisual = new(this);
         }
 
         private void OnEnable()
         {
-            LevelManager.Instance.LevelLoader.OnLevelStartLoading += onLevelStartedLoading;    
+            LevelManager.Instance.LevelLoader.OnLevelStartLoading += onLevelStartedLoading;
         }
 
         private void OnDisable()
         {
-            IsSelectable = false;
+            SetPassengerSelectable(false);
             LevelManager.Instance.LevelLoader.OnLevelStartLoading -= onLevelStartedLoading;
         }
+        #endregion
 
         private void onLevelStartedLoading()
         {
@@ -40,7 +42,7 @@ namespace Runtime.Gameplay
         public void SetStickmanData(StickmanData data)
         {
             Data = data;
-            _passengerColor.SetColor(DataManager.Instance.ColorContainer.GetColorById(data.stickmanColor));
+            _passengerVisual.SetColor(DataManager.Instance.ColorContainer.GetColorById(data.stickmanColor));
         }
 
         public void Select()
@@ -54,14 +56,14 @@ namespace Runtime.Gameplay
         public void SetPassengerSelectable(bool state)
         {
             IsSelectable = state;
-            // TODO: Outline process
+            _passengerVisual.SetOutline(state);
         }
     }
 
-    public struct PassengerColor
+    public struct PassengerVisual
     {
         private PassengerBase _base;
-        public PassengerColor(PassengerBase passenger)
+        public PassengerVisual(PassengerBase passenger)
         {
             _base = passenger;
         }
@@ -71,6 +73,11 @@ namespace Runtime.Gameplay
             MaterialPropertyBlock block = new();
             block.SetColor("_Color", color);
             _base.Renderer.SetPropertyBlock(block);
+        }
+
+        public void SetOutline(bool isActive)
+        {
+            // TODO: Outline process
         }
     }
 }
