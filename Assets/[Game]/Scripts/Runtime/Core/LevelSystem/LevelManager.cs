@@ -42,16 +42,18 @@ namespace Runtime.Core
         {
             if (!IsLevelStarted) return;
             IsLevelStarted = false;
-            CurrentLevel++;
 
-            GameplaySaveSystem.CurrentSaveData = null;
+            if (isSuccess)
+                CurrentLevel++;
+
+            GameplaySaveSystem.RemoveGameplayData();
             OnLevelCompleted?.Invoke();
         }
 
         public void RestartLevel()
         {
             IsLevelStarted = false;
-            GameplaySaveSystem.CurrentSaveData = null;
+            GameplaySaveSystem.RemoveGameplayData();
 
             OnLevelRestart?.Invoke();
         }
