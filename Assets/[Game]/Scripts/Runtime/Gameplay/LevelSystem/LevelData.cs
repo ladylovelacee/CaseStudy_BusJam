@@ -6,11 +6,12 @@ namespace Runtime.Gameplay
     [CreateAssetMenu(fileName = "NewLevel", menuName = "Level Data", order = 1)]
     public class LevelData : ScriptableObject
     {
+        public int duration;
         public int width, height;
         public List<StickmanData> stickmen = new();
         public List<Vector2Int> obstacles = new();
         public List<VehicleData> busQueue = new();
-
+        
         public static LevelData CopyLevelData(LevelData source)
         {
             LevelData copy = ScriptableObject.CreateInstance<LevelData>();

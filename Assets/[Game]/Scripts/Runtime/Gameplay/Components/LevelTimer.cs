@@ -8,8 +8,6 @@ namespace Runtime.Gameplay
 {
     public class LevelTimer : MonoBehaviour
     {
-        public int TimerDuration = 50; //TODO: get duration from level editor
-
         [SerializeField] private GameObject timerVisual;
         [SerializeField] private TextMeshProUGUI txtRemained;
 
@@ -18,25 +16,34 @@ namespace Runtime.Gameplay
         public static int RemainingSeconds;
         private Coroutine _timerCoroutine;
 
-        private void Awake()
-        {
-            Initialize();
-        }
-
         private void Start()
         {
             LevelManager.Instance.OnLevelStarted += onLevelStarted;
+            LevelManager.Instance.OnLevelCompleted += onLevelCompleted;
+            LevelManager.Instance.LevelLoader.OnLevelLoaded += onLevelLoaded;
         }
 
         private void OnDisable()
         {
             LevelManager.Instance.OnLevelStarted -= onLevelStarted;
+            LevelManager.Instance.OnLevelCompleted -= onLevelCompleted;
+            LevelManager.Instance.LevelLoader.OnLevelLoaded -= onLevelLoaded;
+        }
+
+        private void onLevelLoaded()
+        {
+            Initialize();
+        }
+
+        private void onLevelCompleted()
+        {
+            StopTimer();
         }
 
         private void Initialize()
         {
             if (GameplaySaveSystem.CurrentSaveData == null)
-                RemainingSeconds = TimerDuration;
+                RemainingSeconds = LevelLoader.CurrentLevelData.duration;
             else
                 RemainingSeconds = GameplaySaveSystem.CurrentSaveData.LastGameTime;
             UpdateTimerUI();
@@ -49,10 +56,14 @@ namespace Runtime.Gameplay
 
         private void StartTimer()
         {
+            _timerCoroutine = StartCoroutine(TimerCoroutine());
+        }
+
+        private void StopTimer()
+        {
             if (_timerCoroutine != null)
                 StopCoroutine(_timerCoroutine);
-
-            _timerCoroutine = StartCoroutine(TimerCoroutine());
+            _timerCoroutine = null;
         }
 
         private IEnumerator TimerCoroutine()
