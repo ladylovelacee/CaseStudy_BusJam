@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a77fc43faffeacb4daa55b950fa6f7aa, type: 3}
   m_Name: Level_Data_Instance
   m_EditorClassIdentifier: 
+  duration: 0
   width: 0
   height: 0
   stickmen: []

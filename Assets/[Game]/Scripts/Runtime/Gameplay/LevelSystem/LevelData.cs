@@ -19,6 +19,7 @@ namespace Runtime.Gameplay
             // Copy primitive values directly
             copy.width = source.width;
             copy.height = source.height;
+            copy.duration = source.duration;
 
             copy.stickmen = new List<StickmanData>();
             foreach (var stickman in source.stickmen)
@@ -50,7 +51,7 @@ namespace Runtime.Gameplay
 
         public void ResetLevelData()
         {
-            width = 0; height = 0;
+            width = 0; height = 0; duration = 0;
             stickmen.Clear();
             obstacles.Clear();
             busQueue.Clear();
