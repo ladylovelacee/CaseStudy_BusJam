@@ -35,12 +35,17 @@ namespace Runtime.Gameplay
             if(Passengers.Count != 0)
                 Passengers.Clear();
 
-            List<StickmanData> stickmen = data.stickmen;
+            List<StickmanData> stickmen = new();
+
+            if (GameplaySaveSystem.CurrentSaveData != null)
+                stickmen = GameplaySaveSystem.CurrentSaveData.LastStickmenDataList;
+            else
+                stickmen = data.stickmen;
+
             foreach (StickmanData stickman in stickmen)
             {
                 CreatePassenger(stickman);
             }
-
             CheckSelectables();
         }
 

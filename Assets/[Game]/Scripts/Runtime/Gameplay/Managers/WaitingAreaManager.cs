@@ -17,6 +17,14 @@ namespace Runtime.Gameplay
         public void Initialize(LevelData level)
         {
             _currentAvailableSlotCount = WaitingSlotCount;
+
+            if (GameplaySaveSystem.CurrentSaveData != null)
+            {
+                foreach (StickmanData stickman in GameplaySaveSystem.CurrentSaveData.LastWaitingAreaStickmenDataList)
+                {
+                    AddStickman(stickman);
+                }
+            }
         }
 
         public void AddStickman(StickmanData stickmanData)

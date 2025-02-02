@@ -35,7 +35,10 @@ namespace Runtime.Gameplay
 
         private void Initialize()
         {
-            RemainingSeconds = TimerDuration;
+            if (GameplaySaveSystem.CurrentSaveData == null)
+                RemainingSeconds = TimerDuration;
+            else
+                RemainingSeconds = GameplaySaveSystem.CurrentSaveData.LastGameTime;
             UpdateTimerUI();
         }
 

@@ -17,12 +17,27 @@ namespace Runtime.Gameplay
 
         public void Initialize(LevelData data)
         {
-            foreach (VehicleData bus in data.busQueue)
+            List<VehicleData> vehicleDatas = new();
+            if (GameplaySaveSystem.CurrentSaveData != null)
+                vehicleDatas = GameplaySaveSystem.CurrentSaveData.BusQueue;           
+            else
+                vehicleDatas = data.busQueue;
+
+            foreach (VehicleData bus in vehicleDatas)
             {
                 busQueue.Enqueue(bus);
             }
+            SpawnFirstVehicle();
+        }
 
+        private void SpawnFirstVehicle()
+        {
             SpawnNextVehicle();
+            if (GameplaySaveSystem.CurrentSaveData != null)
+            {
+                for (int i = 0; GameplaySaveSystem.CurrentSaveData.LastBusPassengerCount>i; i++) 
+                    CurrentVehicle.AddPassenger();
+            }
         }
 
         private void SpawnNextVehicle()

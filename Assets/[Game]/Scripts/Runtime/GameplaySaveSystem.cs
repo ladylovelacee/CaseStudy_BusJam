@@ -1,6 +1,7 @@
 using Runtime.Gameplay;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class GameplaySaveSystem : MonoBehaviour
@@ -37,9 +38,9 @@ public class GameplaySaveSystem : MonoBehaviour
         }
 
         List<StickmanData> currentWaitingAreaStickmenDataList = WaitingAreaManager.Instance.WaitingsData;
-        Queue<VehicleData> currentBusQueue = VehicleManager.Instance.busQueue;
+        List<VehicleData> currentBusQueue = VehicleManager.Instance.busQueue.ToList();
         int currentBusPassengerCount = VehicleManager.Instance.CurrentVehicle.GetCurrentPassengerCount();
-        float currentGameTime = LevelTimer.RemainingSeconds;
+        int currentGameTime = LevelTimer.RemainingSeconds;
 
         CurrentSaveData = new GameplaySaveData(currentStickmenDataList, currentBusQueue, currentBusPassengerCount, currentWaitingAreaStickmenDataList, currentGameTime);
 
@@ -71,12 +72,12 @@ public class GameplaySaveSystem : MonoBehaviour
     public class GameplaySaveData
     {
         public List<StickmanData> LastStickmenDataList;
-        public Queue<VehicleData> BusQueue;
+        public List<VehicleData> BusQueue;
         public int LastBusPassengerCount;
         public List<StickmanData> LastWaitingAreaStickmenDataList;
-        public float LastGameTime;
+        public int LastGameTime;
 
-        public GameplaySaveData(List<StickmanData> lastStickmenDataList, Queue<VehicleData> busQueue, int lastBusPassengerCount, List<StickmanData> lastWaitingAreaStickmenDataList, float lastGameTime)
+        public GameplaySaveData(List<StickmanData> lastStickmenDataList, List<VehicleData> busQueue, int lastBusPassengerCount, List<StickmanData> lastWaitingAreaStickmenDataList, int lastGameTime)
         {
             LastStickmenDataList = lastStickmenDataList;
             BusQueue = busQueue;
