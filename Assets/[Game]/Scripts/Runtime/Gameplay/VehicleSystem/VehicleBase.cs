@@ -34,6 +34,7 @@ namespace Runtime.Gameplay
             m_Renderer.SetPropertyBlock(block);
         }
 
+        public int GetCurrentPassengerCount() => currentPassengers;
         public void AddPassenger()
         {
             currentPassengers++;

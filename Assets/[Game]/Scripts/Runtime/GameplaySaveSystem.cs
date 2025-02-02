@@ -37,11 +37,11 @@ public class GameplaySaveSystem : MonoBehaviour
         }
 
         List<StickmanData> currentWaitingAreaStickmenDataList = WaitingAreaManager.Instance.WaitingsData;
-        int currentBusOrderIndex = 0;
-        int currentBusPassengerCount = 0;
-        float currentGameTime = 0;
+        Queue<VehicleData> currentBusQueue = VehicleManager.Instance.busQueue;
+        int currentBusPassengerCount = VehicleManager.Instance.CurrentVehicle.GetCurrentPassengerCount();
+        float currentGameTime = LevelTimer.RemainingSeconds;
 
-        CurrentSaveData = new GameplaySaveData(currentStickmenDataList, currentBusOrderIndex, currentBusPassengerCount, currentWaitingAreaStickmenDataList, currentGameTime);
+        CurrentSaveData = new GameplaySaveData(currentStickmenDataList, currentBusQueue, currentBusPassengerCount, currentWaitingAreaStickmenDataList, currentGameTime);
 
         string jsonString = JsonUtility.ToJson(CurrentSaveData);
         PlayerPrefs.SetString(GameplayDataPrefKey, jsonString);
@@ -71,15 +71,15 @@ public class GameplaySaveSystem : MonoBehaviour
     public class GameplaySaveData
     {
         public List<StickmanData> LastStickmenDataList;
-        public int LastBusOrderIndex;
+        public Queue<VehicleData> BusQueue;
         public int LastBusPassengerCount;
         public List<StickmanData> LastWaitingAreaStickmenDataList;
         public float LastGameTime;
 
-        public GameplaySaveData(List<StickmanData> lastStickmenDataList, int lastBusOrderIndex, int lastBusPassengerCount, List<StickmanData> lastWaitingAreaStickmenDataList, float lastGameTime)
+        public GameplaySaveData(List<StickmanData> lastStickmenDataList, Queue<VehicleData> busQueue, int lastBusPassengerCount, List<StickmanData> lastWaitingAreaStickmenDataList, float lastGameTime)
         {
             LastStickmenDataList = lastStickmenDataList;
-            LastBusOrderIndex = lastBusOrderIndex;
+            BusQueue = busQueue;
             LastBusPassengerCount = lastBusPassengerCount;
             LastWaitingAreaStickmenDataList = lastWaitingAreaStickmenDataList;
             LastGameTime = lastGameTime;
