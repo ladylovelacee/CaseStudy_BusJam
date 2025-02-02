@@ -58,7 +58,7 @@ namespace Runtime.Gameplay
             }
         }
 
-        public bool CanPassengerBoard(PassengerBase passenger)=> passenger._colorId.Equals(CurrentVehicle.ColorID) && !CurrentVehicle.IsFull;
+        public bool CanPassengerBoard(PassengerBase passenger)=> passenger.Data.stickmanColor.Equals(CurrentVehicle.ColorID) && !CurrentVehicle.IsFull;
         public void OnBusFilled()
         {
             if (CurrentVehicle != null)
