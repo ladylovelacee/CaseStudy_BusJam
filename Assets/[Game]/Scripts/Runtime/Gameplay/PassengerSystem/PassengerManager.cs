@@ -6,7 +6,6 @@ using Unity.Collections;
 using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace Runtime.Gameplay
 {
@@ -93,6 +92,7 @@ namespace Runtime.Gameplay
             if (WaitingAreaManager.IsFull)
                 return;
 
+            GridManager.SetCellWalkable(passenger.Position.x, passenger.Position.y, true);
             passenger.transform.DOPath(FindPath(passenger.Position, passenger.TargetPos).ToArray(), 2f)
                 .OnComplete(() =>
                 {
@@ -102,7 +102,7 @@ namespace Runtime.Gameplay
                         MoveToWaitingArea(passenger);
                 });
 
-            CheckSelectables();           
+            CheckSelectables();
         }
 
         #region Movement Control
