@@ -11,6 +11,7 @@ namespace Runtime.Gameplay
         public bool IsSelectable { get; private set; } = false;
         public Vector2Int TargetPos;
         private PassengerManager Manager => PassengerManager.Instance;
+        public StickmanData Data { get; private set; }
 
         public ColorIDs _colorId;
 
@@ -19,7 +20,12 @@ namespace Runtime.Gameplay
             PassengerColor = new(this);
         }
 
-        public void Initialize(ColorIDs colorId, Vector2Int pos)
+        public void SetStickmanData(StickmanData data)
+        {
+            Initialize(data.stickmanColor, data.position);
+        }
+
+        private void Initialize(ColorIDs colorId, Vector2Int pos)
         {
             Position = pos;
             _colorId = colorId;

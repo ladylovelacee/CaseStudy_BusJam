@@ -1,29 +1,39 @@
+using Runtime.Core;
+using System;
 using UnityEngine;
 
 namespace Runtime.Gameplay
 {
     public class SelectionManager : MonoBehaviour
     {
-        private float MaxCastDistance = 500f;
         [SerializeField] private LayerMask selectableLayer;
+
+        private InputManager InputManager => InputManager.Instance;
+        private Camera mainCamera;
+        private const float MaxCastDistance = 500f;
+
+        private void Awake()
+        {
+            mainCamera = Camera.main;
+        }
         private void OnEnable()
         {
-            InputManager.Instance.TouchControls.Touch.TouchPress.started += onTouchStarted;
+            InputManager.OnTapDown += onTapDown;
         }
-
         private void OnDisable()
         {
-            InputManager.Instance.TouchControls.Touch.TouchPress.started -= onTouchStarted;
+            InputManager.OnTapDown -= onTapDown;
         }
 
-        private void onTouchStarted(UnityEngine.InputSystem.InputAction.CallbackContext context)
-        {;
-            CheckSelectable(InputManager.Instance.CurrentFingerPosition);
-        }
-
-        private void CheckSelectable(Vector2 fingerPos)
+        private void onTapDown()
         {
-            Ray ray = Camera.main.ScreenPointToRay(fingerPos);
+            if(LevelManager.Instance.IsLevelStarted)
+                CheckSelectable();
+        }
+
+        private void CheckSelectable()
+        {
+            Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
 
             if(Physics.Raycast(ray, out RaycastHit hitInfo, MaxCastDistance, selectableLayer))
             {

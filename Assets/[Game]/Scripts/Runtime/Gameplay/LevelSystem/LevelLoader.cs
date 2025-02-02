@@ -1,6 +1,5 @@
 using UnityEngine;
 
-
 namespace Runtime.Gameplay
 {
     public class LevelLoader : MonoBehaviour
@@ -14,7 +13,9 @@ namespace Runtime.Gameplay
 
         void LoadLevel(LevelData levelData)
         {
-            Debug.Log("Level Loaded: " + levelData.width + "x" + levelData.height);
+            BoardManager.Instance.Initialize(level);
+            PassengerManager.Instance.Initialize(level);
+            VehicleManager.Instance.Initialize(level);
         }
     }
 }
