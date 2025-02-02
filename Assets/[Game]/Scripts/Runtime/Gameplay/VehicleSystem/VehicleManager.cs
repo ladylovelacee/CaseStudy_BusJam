@@ -8,8 +8,6 @@ namespace Runtime.Gameplay
     {
         [field:SerializeField] public Transform WaitPoint { get; private set; }
         [field:SerializeField] public Transform FinishPoint { get; private set; }
-
-        public LevelData levelData; // TODO: Get level data from level manager
         public VehicleBase CurrentVehicle { get; private set; }
         
         [SerializeField] private Transform spawnPoint;
@@ -17,22 +15,13 @@ namespace Runtime.Gameplay
         private VehicleBase vehicleInstance => DataManager.Instance.InstanceContainer.Vehicle;
         private Queue<VehicleData> busQueue = new Queue<VehicleData>();
 
-        private void Start()
+        public void Initialize(LevelData data)
         {
-            InitializeBusQueue();
-            onLevelStarted();
-        }
-
-        private void InitializeBusQueue()
-        {
-            foreach (VehicleData bus in levelData.busQueue)
+            foreach (VehicleData bus in data.busQueue)
             {
                 busQueue.Enqueue(bus);
             }
-        }
 
-        private void onLevelStarted() //TODO: Move to on game start
-        {
             SpawnNextVehicle();
         }
 

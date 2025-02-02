@@ -17,14 +17,26 @@ MonoBehaviour:
   stickmen:
   - position: {x: 4, y: 9}
     stickmanColor: 0
-    ability: 
   - position: {x: 4, y: 7}
     stickmanColor: 0
-    ability: 
   - position: {x: 3, y: 0}
     stickmanColor: 1
-    ability: 
-  cabins: []
+  - position: {x: 1, y: 4}
+    stickmanColor: 1
+  - position: {x: 5, y: 4}
+    stickmanColor: 1
+  - position: {x: 2, y: 6}
+    stickmanColor: 1
+  - position: {x: 1, y: 7}
+    stickmanColor: 1
+  - position: {x: 3, y: 1}
+    stickmanColor: 1
+  - position: {x: 2, y: 1}
+    stickmanColor: 1
+  - position: {x: 3, y: 2}
+    stickmanColor: 1
+  - position: {x: 4, y: 1}
+    stickmanColor: 1
   obstacles: []
   busQueue:
   - colorId: 4
