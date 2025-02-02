@@ -20,6 +20,7 @@ public class LevelEditor : EditorWindow
     private static string[] _levelDataNamesArray = new string[0];
 
     private readonly static string LevelPathString = "Assets/Resources/Data/LevelData/";
+    private readonly static string LevelDataInstancePathString = "Assets/[Game]/Scripts/Level_Data_Instance.asset";
     private readonly static string LevelEditorScenePathString = "Assets/[Game]/Scenes/LevelEditorScene.unity";
 
 
@@ -114,8 +115,6 @@ public class LevelEditor : EditorWindow
     }
     private void DrawBusQueueEditor()
     {
-        if (_instanceLevelData == null) return;
-
         GUILayout.Space(10);
         GUILayout.Label("Bus Queue", EditorStyles.boldLabel);
 
@@ -149,7 +148,7 @@ public class LevelEditor : EditorWindow
     {
         foreach (var stickman in _instanceLevelData.stickmen)
             if (stickman.position == new Vector2Int(x, y))
-                return "S";
+                return stickman.stickmanColor.ToString();
 
         if (_instanceLevelData.obstacles.Contains(new Vector2Int(x, y)))
             return "X";
@@ -160,19 +159,39 @@ public class LevelEditor : EditorWindow
     private void PlaceObjectAt(int x, int y)
     {
         GenericMenu menu = new GenericMenu();
-        menu.AddItem(new GUIContent("Add Stickman"), false, () => AddStickman(x, y));
-        menu.AddItem(new GUIContent("Add Obstacle"), false, () => AddObstacle(x, y));
+        menu.AddSeparator("Add Stickman/");
+        menu.AddItem(new GUIContent("Add Stickman/Green"), false, () => AddStickman(x, y, ColorIDs.Green));
+        menu.AddItem(new GUIContent("Add Stickman/Blue"), false, () => AddStickman(x, y, ColorIDs.Blue));
+        menu.AddItem(new GUIContent("Add Stickman/Yellow"), false, () => AddStickman(x, y, ColorIDs.Yellow));
+        menu.AddItem(new GUIContent("Add Stickman/Orange"), false, () => AddStickman(x, y, ColorIDs.Orange));
+        menu.AddItem(new GUIContent("Add Stickman/White"), false, () => AddStickman(x, y, ColorIDs.White));
+        menu.AddItem(new GUIContent("None"), false, () => Remove(x, y));
         menu.ShowAsContext();
     }
 
-    private void AddStickman(int x, int y)
+    private void AddStickman(int x, int y, ColorIDs colorType)
     {
-        _instanceLevelData.stickmen.Add(new StickmanData { position = new Vector2Int(x, y), stickmanColor = ColorIDs.Blue });
+        for (int i = 0; i < _instanceLevelData.stickmen.Count; i++) {
+
+            if (_instanceLevelData.stickmen[i].position == new Vector2Int(x, y))
+            {
+                _instanceLevelData.stickmen[i].stickmanColor = colorType;
+                return;
+            }
+        } 
+        _instanceLevelData.stickmen.Add(new StickmanData { position = new Vector2Int(x, y), stickmanColor = colorType });
     }
 
-    private void AddObstacle(int x, int y)
+    private void Remove(int x, int y)
     {
-        _instanceLevelData.obstacles.Add(new Vector2Int(x, y));
+        foreach (var stickman in _instanceLevelData.stickmen)
+        {
+            if (stickman.position == new Vector2Int(x, y))
+            {
+                _instanceLevelData.stickmen.Remove(stickman);
+                break;
+            }
+        }
     }
 
     public static bool IsInLevelEditorScene()
@@ -186,7 +205,15 @@ public class LevelEditor : EditorWindow
         if (!IsInLevelEditorScene())
             return;
 
-        _instanceLevelData = CreateInstance<LevelData>();
+        _instanceLevelData = AssetDatabase.LoadAssetAtPath<LevelData>(LevelDataInstancePathString);
+        if( _instanceLevelData == null)
+        {
+            _instanceLevelData = CreateInstance<LevelData>();
+            AssetDatabase.CreateAsset(_instanceLevelData, LevelDataInstancePathString);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+            EditorUtility.SetDirty(_instanceLevelData);
+        }
         LoadLevelData();
     }
 
@@ -223,7 +250,13 @@ public class LevelEditor : EditorWindow
             LoadLevel();
         }
 
-        if (GUILayout.Button("Clear Level"))
+        if(GUILayout.Button("Clear Grid"))
+        {
+            _instanceLevelData.stickmen.Clear();
+            _instanceLevelData.obstacles.Clear();
+        }
+
+        if (GUILayout.Button("Clear Editor"))
         {
             ClearEditor();
             _selectedLevelDataIndex = 0;
@@ -251,22 +284,30 @@ public class LevelEditor : EditorWindow
         isNewLevel = currentLevelData == null;
         _instanceLevelData.height = _height;
         _instanceLevelData.width = _width;
-        currentLevelData = _instanceLevelData;
 
         if (isNewLevel)
         {
+            currentLevelData = CreateInstance<LevelData>();
+            currentLevelData = LevelData.CopyLevelData(_instanceLevelData);
             AssetDatabase.CreateAsset(currentLevelData, LevelPathString + _currentLevelName.Trim() + ".asset");
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
         }
         else
         {
+            currentLevelData = LevelData.CopyLevelData(_instanceLevelData);
             string levelPath = AssetDatabase.GetAssetPath(currentLevelData);
             AssetDatabase.RenameAsset(levelPath, _currentLevelName);
         }
 
         EditorUtility.SetDirty(currentLevelData);
+        
+        _instanceLevelData.ResetLevelData();
+        EditorUtility.SetDirty(_instanceLevelData);
         LoadLevelData();
+
+        EditorUtility.DisplayDialog("Level Successfully Created", currentLevelData.name, "Okay");
+        ClearEditor();
     }
 
     private static LevelData[] GetAllLevelsDataArray()
@@ -311,7 +352,7 @@ public class LevelEditor : EditorWindow
 
             if (levelData != null)
             {
-                _instanceLevelData = levelData;
+                _instanceLevelData = LevelData.CopyLevelData(levelData);
                 _currentLevelName = _instanceLevelData.name;
                 _width = _instanceLevelData.width;
                 _height = _instanceLevelData.height;
