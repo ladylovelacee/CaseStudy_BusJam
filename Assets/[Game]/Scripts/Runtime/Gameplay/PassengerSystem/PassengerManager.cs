@@ -26,12 +26,14 @@ namespace Runtime.Gameplay
         private int waitingAreaSlots = 3;
         private int currentWaitingCount = 0;
 
+        private LevelData levelData => LevelLoader.CurrentLevelData;
+
         private void Awake()
         {
             PassengerPool = new ObjectPoolBase<PassengerBase>(DataManager.Instance.InstanceContainer.Passenger);
         }
 
-        public void Initialize(LevelData data)
+        public void Initialize()
         {
             if(Passengers.Count != 0)
                 Passengers.Clear();
@@ -52,7 +54,7 @@ namespace Runtime.Gameplay
                 }
             }
             else
-                stickmen = data.stickmen;
+                stickmen = levelData.stickmen;
 
             foreach (StickmanData stickman in stickmen)
             {

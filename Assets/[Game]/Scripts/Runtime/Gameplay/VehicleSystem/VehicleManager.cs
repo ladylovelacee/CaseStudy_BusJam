@@ -14,14 +14,20 @@ namespace Runtime.Gameplay
 
         private VehicleBase vehicleInstance => DataManager.Instance.InstanceContainer.Vehicle;
         public Queue<VehicleData> busQueue { get; private set; } = new Queue<VehicleData>();
+        private LevelData levelData => LevelLoader.CurrentLevelData;
+        public ObjectPoolBase<VehicleBase> Pool { get; private set; }
 
-        public void Initialize(LevelData data)
+        private void Awake()
+        {
+            Pool = new(vehicleInstance);
+        }
+        public void Initialize()
         {
             List<VehicleData> vehicleDatas = new();
             if (GameplaySaveSystem.CurrentSaveData != null)
                 vehicleDatas = GameplaySaveSystem.CurrentSaveData.BusQueue;           
             else
-                vehicleDatas = data.busQueue;
+                vehicleDatas = levelData.busQueue;
 
             foreach (VehicleData bus in vehicleDatas)
             {
@@ -45,7 +51,9 @@ namespace Runtime.Gameplay
             if (busQueue.Count > 0)
             {
                 VehicleData nextBus = busQueue.Peek();
-                CurrentVehicle = Instantiate(vehicleInstance, spawnPoint.position, Quaternion.identity);
+
+                CurrentVehicle = Pool.Get();
+                CurrentVehicle.transform.position = spawnPoint.position;
                 CurrentVehicle.Initialize(nextBus.colorId);
             }
         }

@@ -32,7 +32,7 @@ namespace Runtime.Core
             SetPanelVisibility(true);
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             UIManager.Instance?.RemovePanel(panelId);
         }

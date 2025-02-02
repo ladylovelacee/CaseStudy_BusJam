@@ -14,7 +14,7 @@ namespace Runtime.Gameplay
         private int _currentAvailableSlotCount = WaitingSlotCount;
         public bool IsFull => _currentAvailableSlotCount <= 0;
 
-        public void Initialize(LevelData level)
+        public void Initialize()
         {
             _currentAvailableSlotCount = WaitingSlotCount;
 

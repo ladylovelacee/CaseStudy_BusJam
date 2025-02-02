@@ -17,15 +17,18 @@ namespace Runtime.Gameplay
 
         [HideInInspector]
         public int[] WalkableArea {  get; private set; }
+
+        LevelData levelData => LevelLoader.CurrentLevelData;
+
         private void Awake()
         {
             CellPool = new(DataManager.Instance.InstanceContainer.Cell);
         }
 
-        public void Initialize(LevelData data)
+        public void Initialize()
         {
-            width = data.width; 
-            height = data.height;
+            width = levelData.width; 
+            height = levelData.height;
 
             WalkableArea = new int[width * height];
 
@@ -44,8 +47,6 @@ namespace Runtime.Gameplay
         private GridCell CreateCell(int x, int y)
         {
             GridCell cell = CellPool.Get();
-            cell.x = x;
-            cell.y = y;
             cell.transform.position = GetWorldPosition(x,y);
 
             WalkableArea[x + (y * width)] = 1;

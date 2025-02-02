@@ -1,4 +1,6 @@
 using DG.Tweening;
+using Runtime.Core;
+using System;
 using UnityEngine;
 
 namespace Runtime.Gameplay
@@ -15,6 +17,20 @@ namespace Runtime.Gameplay
         private int currentPassengers = 0;
 
         private const float MoveDuration = 2.0f;
+        private void OnEnable()
+        {
+            LevelManager.Instance.LevelLoader.OnLevelStartLoading += onLevelStartLoading;
+        }
+        private void OnDisable()
+        {
+            LevelManager.Instance.LevelLoader.OnLevelStartLoading -= onLevelStartLoading;
+        }
+
+        private void onLevelStartLoading()
+        {
+            Manager.Pool.Release(this);
+        }
+
         public void Initialize(ColorIDs color)
         {
             ColorID = color;

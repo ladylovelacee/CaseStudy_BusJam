@@ -1,3 +1,5 @@
+using Runtime.Core;
+using System;
 using UnityEngine;
 
 namespace Runtime.Gameplay
@@ -18,6 +20,22 @@ namespace Runtime.Gameplay
         private void Awake()
         {
             PassengerColor = new(this);
+        }
+
+        private void OnEnable()
+        {
+            LevelManager.Instance.LevelLoader.OnLevelStartLoading += onLevelStartedLoading;    
+        }
+
+        private void OnDisable()
+        {
+            LevelManager.Instance.LevelLoader.OnLevelStartLoading -= onLevelStartedLoading;
+            IsSelectable = false;
+        }
+
+        private void onLevelStartedLoading()
+        {
+            Manager.PassengerPool.Release(this);
         }
 
         public void SetStickmanData(StickmanData data)
