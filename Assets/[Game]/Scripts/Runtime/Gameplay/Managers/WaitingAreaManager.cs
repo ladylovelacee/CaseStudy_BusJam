@@ -1,4 +1,5 @@
 using Runtime.Core;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -16,12 +17,14 @@ namespace Runtime.Gameplay
 
         public void Initialize()
         {
+            WaitingsData.Clear();
             _currentAvailableSlotCount = WaitingSlotCount;
 
             if (GameplaySaveSystem.CurrentSaveData != null)
             {
                 foreach (StickmanData stickman in GameplaySaveSystem.CurrentSaveData.LastWaitingAreaStickmenDataList)
                 {
+                    _currentAvailableSlotCount--;
                     AddStickman(stickman);
                 }
             }

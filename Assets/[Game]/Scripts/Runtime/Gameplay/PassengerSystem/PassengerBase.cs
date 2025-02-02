@@ -33,6 +33,8 @@ namespace Runtime.Gameplay
             DOTween.Kill(gameObject);
 
             SetPassengerSelectable(false);
+            VehicleManager.Instance.OnVehicleBoarded -= onVehicleBoarded;
+
             LevelManager.Instance.LevelLoader.OnLevelStartLoading -= onLevelStartedLoading;
         }
         #endregion
@@ -68,11 +70,12 @@ namespace Runtime.Gameplay
             VehicleManager.Instance.OnVehicleBoarded += onVehicleBoarded;
         }
 
-        private void onVehicleBoarded()
+        public void onVehicleBoarded()
         {
             if (Manager.CanBoardVehicle(this))
             {
                 VehicleManager.Instance.OnVehicleBoarded -= onVehicleBoarded;
+                WaitingAreaManager.Instance._currentAvailableSlotCount++;
                 VehicleManager.Instance.CurrentVehicle.currentPassengers++;
 
                 transform.DOMove(VehicleManager.Instance.CurrentVehicle.transform.position, .5f).SetEase(Ease.Linear)

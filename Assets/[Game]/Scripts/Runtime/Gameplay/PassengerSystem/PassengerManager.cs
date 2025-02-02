@@ -102,6 +102,8 @@ namespace Runtime.Gameplay
             else
             {
                 passenger.Data.worldPosition = tilePos;
+                passenger.StartPeeking();
+
                 WaitingAreaManager.Instance._currentAvailableSlotCount--;
             }
 
@@ -189,7 +191,6 @@ namespace Runtime.Gameplay
         private void MoveToWaitingArea(PassengerBase passenger)
         {
             WaitingAreaManager.Instance.AddStickman(passenger.Data);
-            passenger.StartPeeking();
         }
     }
 }

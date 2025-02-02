@@ -28,6 +28,12 @@ namespace Runtime.Gameplay
 
         public void Initialize()
         {
+            if(CurrentVehicle != null)
+            {
+                Pool.Release(CurrentVehicle);
+                DOTween.KillAll(CurrentVehicle.gameObject);
+            }
+
             List<VehicleData> vehicleDatas = new();
             if (GameplaySaveSystem.CurrentSaveData != null)
                 vehicleDatas = GameplaySaveSystem.CurrentSaveData.BusQueue;           
@@ -44,7 +50,6 @@ namespace Runtime.Gameplay
         private void SpawnFirstVehicle()
         {
             SpawnNextVehicle(true);
-            DOTween.Kill(CurrentVehicle.gameObject);
             if (GameplaySaveSystem.CurrentSaveData != null)
             {
                 for (int i = 0; GameplaySaveSystem.CurrentSaveData.LastBusPassengerCount>i; i++)

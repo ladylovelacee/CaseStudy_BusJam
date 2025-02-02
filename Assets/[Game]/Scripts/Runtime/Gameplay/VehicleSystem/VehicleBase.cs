@@ -27,11 +27,14 @@ namespace Runtime.Gameplay
         }
         private void OnDisable()
         {
+            DOTween.KillAll(gameObject);
             LevelManager.Instance.LevelLoader.OnLevelStartLoading -= onLevelStartLoading;
         }
 
         private void onLevelStartLoading()
         {
+            DOTween.KillAll(gameObject);
+
             Manager.Pool.Release(this);
             for (int i = 0; i < m_DummyPassengerArray.Length; i++)
             {
@@ -47,7 +50,10 @@ namespace Runtime.Gameplay
             IsBoarded = false;
             ColorID = color;
             VisualSetup();
-            Move(Manager.WaitPoint.position, isFirstBus ? .1f : MoveDuration, onVehicleBoarded);
+            if (!isFirstBus)
+                Move(Manager.WaitPoint.position, isFirstBus ? .1f : MoveDuration, onVehicleBoarded);
+            else
+                onVehicleBoarded();
         }
 
         private void onVehicleBoarded()
