@@ -7,28 +7,34 @@ using System.Linq;
 
 public class LevelEditor : EditorWindow
 {
-    private LevelData _instanceLevelData;
-    private int gridSize = 8;
+    private static LevelData _instanceLevelData;
     private float cellSize = 50f;
-    private int _width;
-    private int _height;
     private Vector2 _scrollPos;
-    private int _selectedLevelDataIndex;
-    private string _currentLevelName;
-    private string[] _levelDataNamesArray = new string[0];
-    private LevelData[] _allLevelDataArray;
 
-    private readonly string LevelPathString = "Assets/Resources/Data/LevelData/";
+    private static int _width;
+    private static int _height;
+    private static string _currentLevelName;
+    private static string _lastLoadedLevelName;
+    private static int _selectedLevelDataIndex;
+    private static LevelData[] _allLevelDataArray;
+    private static string[] _levelDataNamesArray = new string[0];
+
+    private readonly static string LevelPathString = "Assets/Resources/Data/LevelData/";
+    private readonly static string LevelEditorScenePathString = "Assets/[Game]/Scenes/LevelEditorScene.unity";
+
 
     [MenuItem("Tools/Level Editor")]
     public static void ShowWindow()
     {
-        GetWindow<LevelEditor>("Level Editor");
+        EditorWindow levelEditorToolWindow = GetWindow<LevelEditor>("Level Editor");
+        EditorSceneManager.OpenScene(LevelEditorScenePathString);
+        levelEditorToolWindow.Show();
+        ClearEditor();
     }
 
     private void OnEnable()
     {
-        Initialize();
+        ClearEditor();
     }
 
     private void OnGUI()
@@ -38,7 +44,7 @@ public class LevelEditor : EditorWindow
 
         if (GUILayout.Button("Reload Editor Tool"))
         {
-            Initialize();
+            ClearEditor();
         }
 
         _scrollPos = EditorGUILayout.BeginScrollView(_scrollPos);
@@ -175,7 +181,7 @@ public class LevelEditor : EditorWindow
         return isInCorrectScene;
     }
 
-    private void Initialize()
+    private static void Initialize()
     {
         if (!IsInLevelEditorScene())
             return;
@@ -219,7 +225,8 @@ public class LevelEditor : EditorWindow
 
         if (GUILayout.Button("Clear Level"))
         {
-            ClearLevelArea();
+            ClearEditor();
+            _selectedLevelDataIndex = 0;
         }
 
         EditorGUILayout.EndHorizontal();
@@ -234,20 +241,17 @@ public class LevelEditor : EditorWindow
         LevelData[] levelDataArray = GetAllLevelsDataArray();
         for (int i = 0; i < levelDataArray.Length; i++)
         {
-            if (levelDataArray[i].name == _currentLevelName)
+            if (levelDataArray[i].name == _lastLoadedLevelName)
             {
                 currentLevelData = levelDataArray[i];
                 break;
             }
         }
 
-        if (currentLevelData == null)
-        {
-            isNewLevel = true;
-            _instanceLevelData.height = _height;
-            _instanceLevelData.width = _width;
-            currentLevelData = _instanceLevelData;
-        }
+        isNewLevel = currentLevelData == null;
+        _instanceLevelData.height = _height;
+        _instanceLevelData.width = _width;
+        currentLevelData = _instanceLevelData;
 
         if (isNewLevel)
         {
@@ -265,9 +269,9 @@ public class LevelEditor : EditorWindow
         LoadLevelData();
     }
 
-    private LevelData[] GetAllLevelsDataArray()
+    private static LevelData[] GetAllLevelsDataArray()
     {
-        LevelData[] levelDataArray = new LevelData[0];
+        LevelData[] levelDataArray;
 
         var guids = AssetDatabase.FindAssets("", new string[] { LevelPathString });
         levelDataArray = new LevelData[guids.Length];
@@ -302,7 +306,7 @@ public class LevelEditor : EditorWindow
     {
         if (_selectedLevelDataIndex > 0)
         {
-            ClearLevelArea();
+            ClearEditor();
             var levelData = GetLevelData();
 
             if (levelData != null)
@@ -311,6 +315,7 @@ public class LevelEditor : EditorWindow
                 _currentLevelName = _instanceLevelData.name;
                 _width = _instanceLevelData.width;
                 _height = _instanceLevelData.height;
+                _lastLoadedLevelName = _instanceLevelData.name;
 
                 Debug.Log("Level loaded!");
             }
@@ -322,9 +327,10 @@ public class LevelEditor : EditorWindow
         }
     }
 
-    private void ClearLevelArea()
+    private static void ClearEditor()
     {
         _currentLevelName = null;
+        _lastLoadedLevelName = "";
         _width = 0;
         _height = 0;
         Initialize();
@@ -332,7 +338,7 @@ public class LevelEditor : EditorWindow
         Debug.Log("Level Cleared!");
     }
 
-    private void LoadLevelData()
+    private static void LoadLevelData()
     {
         _allLevelDataArray = GetAllLevelsDataArray();
         _levelDataNamesArray = _allLevelDataArray.Select(x => x.name).Prepend("None").ToArray();
