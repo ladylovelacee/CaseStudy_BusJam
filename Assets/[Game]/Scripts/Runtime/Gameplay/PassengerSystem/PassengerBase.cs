@@ -86,6 +86,7 @@ namespace Runtime.Gameplay
             {
                 VehicleManager.Instance.OnVehicleBoarded -= onVehicleBoarded;
                 WaitingAreaManager.Instance._currentAvailableSlotCount++;
+                WaitingAreaManager.Instance.RemoveStickman(Data);
                 VehicleManager.Instance.CurrentVehicle.currentPassengers++;
 
                 transform.DOMove(VehicleManager.Instance.CurrentVehicle.transform.position, .5f).SetEase(Ease.Linear)

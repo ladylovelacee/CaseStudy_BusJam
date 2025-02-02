@@ -38,6 +38,14 @@ namespace Runtime.Gameplay
                 LevelManager.Instance.CompleteLevel(false);
         }
 
+        public void RemoveStickman(StickmanData stickmanData)
+        {
+            if (WaitingsData.Contains(stickmanData))
+            {
+                WaitingsData.Remove(stickmanData);
+            }
+        }
+
         public Vector3 GetAvailableTilePos()=> IsFull ? waitingAreaPos[0].position : waitingAreaPos[_currentAvailableSlotCount-1].position;
     }
 }
