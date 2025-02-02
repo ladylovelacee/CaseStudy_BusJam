@@ -47,8 +47,11 @@ namespace Runtime.Gameplay
             DOTween.Kill(CurrentVehicle.gameObject);
             if (GameplaySaveSystem.CurrentSaveData != null)
             {
-                for (int i = 0; GameplaySaveSystem.CurrentSaveData.LastBusPassengerCount>i; i++) 
+                for (int i = 0; GameplaySaveSystem.CurrentSaveData.LastBusPassengerCount>i; i++)
+                {
+                    CurrentVehicle.currentPassengers++;
                     CurrentVehicle.AddPassenger();
+                }
             }
             CurrentVehicle.transform.position = WaitPoint.position;
         }
@@ -65,7 +68,7 @@ namespace Runtime.Gameplay
             }
         }
 
-        public bool CanPassengerBoard(PassengerBase passenger)=> passenger.Data.stickmanColor.Equals(CurrentVehicle.ColorID) && !CurrentVehicle.IsFull;
+        public bool CanPassengerBoard(PassengerBase passenger)=> passenger.Data.stickmanColor.Equals(CurrentVehicle.ColorID) && !CurrentVehicle.IsFull && CurrentVehicle.IsBoarded;
         public void OnVehicleFilled()
         {
             if (CurrentVehicle != null)
@@ -74,6 +77,9 @@ namespace Runtime.Gameplay
                 CurrentVehicle = null;
                 SpawnNextVehicle();
             }
+
+            if (busQueue.Count <= 0)
+                LevelManager.Instance.CompleteLevel(true);
         }
 
         public void OnVehicleWaitForPassengers()

@@ -10,11 +10,11 @@ namespace Runtime.Gameplay
         [SerializeField] Renderer m_Renderer;
         public ColorIDs ColorID { get; private set; }
         public bool IsFull => currentPassengers >= maxCapacity;
-        
+        public bool IsBoarded;
         private VehicleManager Manager => VehicleManager.Instance;
 
         private int maxCapacity = 3; // TODO: make generic
-        private int currentPassengers = 0;
+        public int currentPassengers = 0;
 
         private const float MoveDuration = 1;
         private void OnEnable()
@@ -33,11 +33,17 @@ namespace Runtime.Gameplay
 
         public void Initialize(ColorIDs color)
         {
+            currentPassengers = 0;
             ColorID = color;
             VisualSetup();
-            Move(Manager.WaitPoint.position, MoveDuration,Manager.OnVehicleWaitForPassengers);
+            Move(Manager.WaitPoint.position, MoveDuration, onVehicleBoarded);
         }
 
+        private void onVehicleBoarded()
+        {
+            IsBoarded = true;
+            Manager.OnVehicleWaitForPassengers();
+        }
         private void Move(Vector3 target, float duration = 1, Action stopAction = null)
         {
             transform.DOMove(target, MoveDuration)
@@ -58,8 +64,6 @@ namespace Runtime.Gameplay
         public int GetCurrentPassengerCount() => currentPassengers;
         public void AddPassenger()
         {
-            currentPassengers++;
-
             if (IsFull)
             {
                 Move(Manager.FinishPoint.position);

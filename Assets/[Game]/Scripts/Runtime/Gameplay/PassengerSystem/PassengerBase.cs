@@ -1,3 +1,4 @@
+using DG.Tweening;
 using Runtime.Core;
 using System;
 using UnityEngine;
@@ -29,6 +30,8 @@ namespace Runtime.Gameplay
 
         private void OnDisable()
         {
+            DOTween.Kill(gameObject);
+
             SetPassengerSelectable(false);
             LevelManager.Instance.LevelLoader.OnLevelStartLoading -= onLevelStartedLoading;
         }
@@ -36,6 +39,7 @@ namespace Runtime.Gameplay
 
         private void onLevelStartedLoading()
         {
+            DOTween.Kill(gameObject);
             Manager.PassengerPool.Release(this);
         }
 
@@ -57,6 +61,28 @@ namespace Runtime.Gameplay
         {
             IsSelectable = state;
             _passengerVisual.SetOutline(state);
+        }
+
+        public void StartPeeking()
+        {
+            VehicleManager.Instance.OnVehicleBoarded += onVehicleBoarded;
+        }
+
+        private void onVehicleBoarded()
+        {
+
+            if (Manager.CanBoardVehicle(this))
+            {
+                VehicleManager.Instance.OnVehicleBoarded -= onVehicleBoarded;
+                VehicleManager.Instance.CurrentVehicle.currentPassengers++;
+
+                transform.DOMove(VehicleManager.Instance.CurrentVehicle.transform.position, .5f).SetEase(Ease.Linear)
+                    .OnComplete(() =>
+                    {
+                        VehicleManager.Instance.CurrentVehicle.AddPassenger();
+                        Manager.PassengerPool.Release(this);
+                    }).SetLink(gameObject);
+            }
         }
     }
 

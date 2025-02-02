@@ -68,8 +68,6 @@ namespace Runtime.Gameplay
         {
             if (!Passengers.Contains(passenger)) return;
             Passengers.Remove(passenger);
-            //if (_passengers.Count <= 0)
-            //    LevelManager.Instance.CompleteLevel(true); //Can be ERROR!
         }
 
         public void CreatePassenger(StickmanData stickman)
@@ -89,10 +87,27 @@ namespace Runtime.Gameplay
                 return;
 
             GridManager.SetCellWalkable(passenger.Data.position.x, passenger.Data.position.y, true);
-            passenger.transform.DOPath(FindPath(passenger.Data.position, passenger.TargetBoardPos).ToArray(), 2f)
+
+            float distance = Vector2Int.Distance(passenger.Data.position, passenger.TargetBoardPos);
+            List<Vector3> path = FindPath(passenger.Data.position, passenger.TargetBoardPos);
+            Vector3 tilePos = WaitingAreaManager.GetAvailableTilePos();
+            path.Add(tilePos);
+            bool isBoarded = CanBoardVehicle(passenger);
+            if (isBoarded)
+            {
+                path.Add(VehicleManager.Instance.CurrentVehicle.transform.position);
+                VehicleManager.Instance.CurrentVehicle.currentPassengers++;
+            }
+            else
+            {
+                passenger.Data.worldPosition = tilePos;
+                WaitingAreaManager.Instance._currentAvailableSlotCount--;
+            }
+
+            passenger.transform.DOPath(path.ToArray(), distance/1f).SetEase(Ease.Linear)
                 .OnComplete(() =>
                 {
-                    if (CanBoardVehicle(passenger))
+                    if (isBoarded)
                         BoardPassenger(passenger);
                     else
                         MoveToWaitingArea(passenger);
@@ -149,22 +164,19 @@ namespace Runtime.Gameplay
             }
         }
         #endregion
-        private bool CanBoardVehicle(PassengerBase passenger)=> VehicleManager.Instance.CanPassengerBoard(passenger);
+        public bool CanBoardVehicle(PassengerBase passenger)=> VehicleManager.Instance.CanPassengerBoard(passenger);
 
         private void BoardPassenger(PassengerBase passenger)
         {
             OnPassengerBoarded?.Invoke(passenger);
-            passenger.transform.SetParent(VehicleManager.Instance.CurrentVehicle.transform);
-            passenger.transform.DOMove(VehicleManager.Instance.CurrentVehicle.transform.position, .5f)
-                .OnComplete(VehicleManager.Instance.CurrentVehicle.AddPassenger);
+            PassengerPool.Release(passenger);
+            VehicleManager.Instance.CurrentVehicle.AddPassenger();
         }
 
         private void MoveToWaitingArea(PassengerBase passenger)
         {
-            Vector3 pos = WaitingAreaManager.Instance.GetAvailableTilePos();
             WaitingAreaManager.Instance.AddStickman(passenger.Data);
-            passenger.transform.DOMove(pos, .5f);
-            passenger.Data.worldPosition = pos;
+            passenger.StartPeeking();
         }
     }
 }

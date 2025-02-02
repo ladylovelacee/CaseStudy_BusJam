@@ -188,12 +188,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Levels:
-  - {fileID: 11400000, guid: 144076f279344aa4fb9cde19c8917dd8, type: 2}
   - {fileID: 11400000, guid: 11241ded1d63a9240936cb1dc69bafcd, type: 2}
   - {fileID: 11400000, guid: 505b4e087481ccb4183424fd6d7fc371, type: 2}
   - {fileID: 11400000, guid: f4a6f07ed060b5b4394e569c4741bc39, type: 2}
   - {fileID: 11400000, guid: ac9ee1ba3dbc2e043bf66e9c3a7928a6, type: 2}
   - {fileID: 11400000, guid: f9499fc46242e08479dabca22337a8f8, type: 2}
+  - {fileID: 11400000, guid: 144076f279344aa4fb9cde19c8917dd8, type: 2}
   LevelLoader: {fileID: 1855206223}
 --- !u!114 &169981369
 MonoBehaviour:

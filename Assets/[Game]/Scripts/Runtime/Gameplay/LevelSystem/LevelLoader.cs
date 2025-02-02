@@ -1,3 +1,4 @@
+using DG.Tweening;
 using Runtime.Core;
 using System;
 using UnityEngine;
@@ -25,7 +26,7 @@ namespace Runtime.Gameplay
             VehicleManager.Instance.Initialize();
             WaitingAreaManager.Instance.Initialize();
 
-            OnLevelLoaded?.Invoke();
+            DOVirtual.DelayedCall(.5f,()=> OnLevelLoaded?.Invoke());
         }
 
         public void LoadLevel() 
