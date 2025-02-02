@@ -42,6 +42,7 @@ namespace Runtime.Gameplay
         public void CheckCurrentBus()
         {
             LevelManager.Instance.OnLevelStarted += onLevelStarted;
+            StartPeeking();
         }
         private void onLevelStarted()
         {
