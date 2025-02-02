@@ -6,7 +6,7 @@ namespace Runtime.Gameplay
     {
         private void OnEnable()
         {
-            LevelManager.Instance.OnLevelCompleted += onLevelCompleted;
+            //LevelManager.Instance.OnLevelCompleted += onLevelCompleted;
             LevelManager.Instance.LevelLoader.OnLevelLoaded += onLevelLoaded;
         }
 
@@ -24,7 +24,7 @@ namespace Runtime.Gameplay
         public override void Dispose()
         {
             base.Dispose();
-            LevelManager.Instance.OnLevelCompleted -= onLevelCompleted;
+            //LevelManager.Instance.OnLevelCompleted -= onLevelCompleted;
             LevelManager.Instance.LevelLoader.OnLevelLoaded -= onLevelLoaded;
         }
     }

@@ -11,15 +11,15 @@ namespace Runtime.Gameplay
         private void OnEnable()
         {
             UpdateText();
-            LevelManager.Instance.OnLevelCompleted += onLevelCompleted;
+            LevelManager.Instance.OnLevelEnd += onLevelCompleted;
         }
 
         private void OnDisable()
         {
-            LevelManager.Instance.OnLevelCompleted -= onLevelCompleted;
+            LevelManager.Instance.OnLevelEnd -= onLevelCompleted;
         }
 
-        private void onLevelCompleted()
+        private void onLevelCompleted(bool success)
         {
             UpdateText();
         }

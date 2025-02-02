@@ -19,14 +19,14 @@ namespace Runtime.Gameplay
         private void Start()
         {
             LevelManager.Instance.OnLevelStarted += onLevelStarted;
-            LevelManager.Instance.OnLevelCompleted += onLevelCompleted;
+            LevelManager.Instance.OnLevelEnd += onLevelEnd;
             LevelManager.Instance.LevelLoader.OnLevelLoaded += onLevelLoaded;
         }
 
         private void OnDisable()
         {
             LevelManager.Instance.OnLevelStarted -= onLevelStarted;
-            LevelManager.Instance.OnLevelCompleted -= onLevelCompleted;
+            LevelManager.Instance.OnLevelEnd -= onLevelEnd;
             LevelManager.Instance.LevelLoader.OnLevelLoaded -= onLevelLoaded;
         }
 
@@ -35,7 +35,7 @@ namespace Runtime.Gameplay
             Initialize();
         }
 
-        private void onLevelCompleted()
+        private void onLevelEnd(bool success)
         {
             StopTimer();
         }

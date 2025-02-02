@@ -9,7 +9,7 @@ namespace Runtime.Core
     {
         public event Action OnLevelStarted;
         public event Action OnLevelRestart;
-        public event Action OnLevelCompleted;
+        public event Action<bool> OnLevelEnd;
 
         [field: SerializeField] 
         public List<LevelData> Levels = new();
@@ -47,7 +47,7 @@ namespace Runtime.Core
                 CurrentLevel++;
 
             GameplaySaveSystem.RemoveGameplayData();
-            OnLevelCompleted?.Invoke();
+            OnLevelEnd?.Invoke(isSuccess);
         }
 
         public void RestartLevel()
