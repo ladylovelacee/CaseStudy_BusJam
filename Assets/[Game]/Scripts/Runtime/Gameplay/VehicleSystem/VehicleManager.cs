@@ -43,7 +43,7 @@ namespace Runtime.Gameplay
 
         private void SpawnFirstVehicle()
         {
-            SpawnNextVehicle();
+            SpawnNextVehicle(true);
             DOTween.Kill(CurrentVehicle.gameObject);
             if (GameplaySaveSystem.CurrentSaveData != null)
             {
@@ -56,7 +56,7 @@ namespace Runtime.Gameplay
             CurrentVehicle.transform.position = WaitPoint.position;
         }
 
-        private void SpawnNextVehicle()
+        private void SpawnNextVehicle(bool isFirstBus)
         {
             if (busQueue.Count > 0)
             {
@@ -64,18 +64,18 @@ namespace Runtime.Gameplay
 
                 CurrentVehicle = Pool.Get();
                 CurrentVehicle.transform.position = spawnPoint.position;
-                CurrentVehicle.Initialize(nextBus.colorId);
+                CurrentVehicle.Initialize(nextBus.colorId, isFirstBus);
             }
         }
 
-        public bool CanPassengerBoard(PassengerBase passenger)=> passenger.Data.stickmanColor.Equals(CurrentVehicle.ColorID) && !CurrentVehicle.IsFull && CurrentVehicle.IsBoarded;
+        public bool CanPassengerBoard(PassengerBase passenger)=> passenger.Data.stickmanColor.Equals(CurrentVehicle.ColorID) && !CurrentVehicle.IsFull && CurrentVehicle. IsBoarded;
         public void OnVehicleFilled()
         {
             if (CurrentVehicle != null)
             {
                 busQueue.Dequeue();
                 CurrentVehicle = null;
-                SpawnNextVehicle();
+                SpawnNextVehicle(false);
             }
 
             if (busQueue.Count <= 0)

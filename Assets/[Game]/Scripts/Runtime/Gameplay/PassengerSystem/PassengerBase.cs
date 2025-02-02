@@ -70,7 +70,6 @@ namespace Runtime.Gameplay
 
         private void onVehicleBoarded()
         {
-
             if (Manager.CanBoardVehicle(this))
             {
                 VehicleManager.Instance.OnVehicleBoarded -= onVehicleBoarded;

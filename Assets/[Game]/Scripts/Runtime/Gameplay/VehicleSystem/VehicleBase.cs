@@ -18,6 +18,7 @@ namespace Runtime.Gameplay
         public int currentPassengers = 0;
         private int _dummyPassengerIndex = 0;
         private Tween _checkTween;
+        private Tween _moveTween;
 
         private const float MoveDuration = 1.5f;
         private void OnEnable()
@@ -36,15 +37,17 @@ namespace Runtime.Gameplay
             {
                 m_DummyPassengerArray[i].gameObject.SetActive(false);
             }
+            IsBoarded = false;
         }
 
-        public void Initialize(ColorIDs color)
+        public void Initialize(ColorIDs color, bool isFirstBus)
         {
             currentPassengers = 0;
             _dummyPassengerIndex = 0;
+            IsBoarded = false;
             ColorID = color;
             VisualSetup();
-            Move(Manager.WaitPoint.position, MoveDuration, onVehicleBoarded);
+            Move(Manager.WaitPoint.position, isFirstBus ? .1f : MoveDuration, onVehicleBoarded);
         }
 
         private void onVehicleBoarded()
@@ -54,7 +57,8 @@ namespace Runtime.Gameplay
         }
         private void Move(Vector3 target, float duration = 1, Action stopAction = null)
         {
-            transform.DOMove(target, MoveDuration).SetEase(Ease.InSine)
+            _moveTween?.Kill();
+            _moveTween = transform.DOMove(target, duration).SetEase(Ease.InSine)
                 .OnComplete(()=>{
                     if(stopAction != null)
                         stopAction();
