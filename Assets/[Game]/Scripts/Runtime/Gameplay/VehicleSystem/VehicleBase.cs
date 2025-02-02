@@ -9,7 +9,7 @@ namespace Runtime.Gameplay
     {
         [SerializeField] Renderer m_Renderer;
         public ColorIDs ColorID { get; private set; }
-        public bool IsFull => currentPassengers >= maxCapacity; // TODO : check empty seat count
+        public bool IsFull => currentPassengers >= maxCapacity;
         
         private VehicleManager Manager => VehicleManager.Instance;
 
