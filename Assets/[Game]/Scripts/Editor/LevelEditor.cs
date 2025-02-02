@@ -36,6 +36,11 @@ public class LevelEditor : EditorWindow
         if (!IsInLevelEditorScene())
             return;
 
+        if (GUILayout.Button("Reload Editor Tool"))
+        {
+            Initialize();
+        }
+
         _scrollPos = EditorGUILayout.BeginScrollView(_scrollPos);
 
         //levelData = (LevelData)EditorGUILayout.ObjectField("Level Data", levelData, typeof(LevelData), false);
@@ -45,9 +50,18 @@ public class LevelEditor : EditorWindow
         DrawGrid();
         DrawBusQueueEditor();
 
-        if (GUILayout.Button("Reload Editor Tool"))
+        GUILayout.Space(25);
+
+        if (GUILayout.Button("Save Level",GUILayout.Height(100)))
         {
-            Initialize();
+            if (_currentLevelName.Length > 0)
+            {
+                SaveLevel();
+            }
+            else
+            {
+                EditorUtility.DisplayDialog("Level Save Error!", "Please enter level name", "Okay");
+            }
         }
 
         EditorGUILayout.EndScrollView();
@@ -197,19 +211,6 @@ public class LevelEditor : EditorWindow
 
         EditorGUILayout.BeginVertical();
         EditorGUILayout.BeginHorizontal();
-
-
-        if (GUILayout.Button("Save Level"))
-        {
-            if (_currentLevelName.Length > 0)
-            {
-                SaveLevel();
-            }
-            else
-            {
-                EditorUtility.DisplayDialog("Level Save Error!", "Please enter level name", "Okay");
-            }
-        }
 
         if (GUILayout.Button("Load Level"))
         {
