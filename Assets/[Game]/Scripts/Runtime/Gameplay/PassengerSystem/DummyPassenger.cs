@@ -13,7 +13,7 @@ public class DummyPassenger : MonoBehaviour
     public void SetColor(Color color)
     {
         MaterialPropertyBlock block = new();
-        block.SetColor("_Color", color);
+        block.SetColor("_BaseColor", color);
         Renderer.SetPropertyBlock(block);
     }
 }

@@ -75,7 +75,7 @@ namespace Runtime.Gameplay
         {
             Color color = DataManager.Instance.ColorContainer.GetColorById(ColorID);
             MaterialPropertyBlock block = new();
-            block.SetColor("_Color", color);
+            block.SetColor("_BaseColor", color);
             m_Renderer.SetPropertyBlock(block, 0);
 
             for (int i = 0; i < m_DummyPassengerArray.Length; i++)

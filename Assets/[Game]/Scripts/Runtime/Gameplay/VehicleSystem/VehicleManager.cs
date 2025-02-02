@@ -28,18 +28,19 @@ namespace Runtime.Gameplay
 
         public void Initialize()
         {
-            if(CurrentVehicle != null)
-            {
-                Pool.Release(CurrentVehicle);
-                DOTween.KillAll(CurrentVehicle.gameObject);
-            }
-
+            //if(CurrentVehicle != null)
+            //{
+            //    Pool.Release(CurrentVehicle);
+            //    DOTween.KillAll(CurrentVehicle.gameObject);
+            //}
+            
             List<VehicleData> vehicleDatas = new();
             if (GameplaySaveSystem.CurrentSaveData != null)
                 vehicleDatas = GameplaySaveSystem.CurrentSaveData.BusQueue;           
             else
                 vehicleDatas = levelData.busQueue;
 
+            busQueue.Clear();
             foreach (VehicleData bus in vehicleDatas)
             {
                 busQueue.Enqueue(bus);

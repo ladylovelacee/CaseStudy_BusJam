@@ -109,7 +109,7 @@ namespace Runtime.Gameplay
         public void SetColor(Color color) 
         {
             MaterialPropertyBlock block = new();
-            block.SetColor("_Color", color);
+            block.SetColor("_BaseColor", color);
             _base.Renderer.SetPropertyBlock(block);
         }
 

@@ -14,7 +14,8 @@ namespace Runtime.Gameplay
 
         private void OnDisable()
         {
-            LevelManager.Instance.LevelLoader.OnLevelStartLoading -= onLevelStartLoading;
+            if(LevelManager.Instance)
+                LevelManager.Instance.LevelLoader.OnLevelStartLoading -= onLevelStartLoading;
         }
 
         private void onLevelStartLoading()
