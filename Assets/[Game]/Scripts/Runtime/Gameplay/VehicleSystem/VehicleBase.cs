@@ -8,6 +8,7 @@ namespace Runtime.Gameplay
     public class VehicleBase : MonoBehaviour
     {
         [SerializeField] Renderer m_Renderer;
+        [SerializeField] DummyPassenger[] m_DummyPassengerArray;
         public ColorIDs ColorID { get; private set; }
         public bool IsFull => currentPassengers >= maxCapacity;
         public bool IsBoarded;
@@ -30,6 +31,10 @@ namespace Runtime.Gameplay
         private void onLevelStartLoading()
         {
             Manager.Pool.Release(this);
+            for (int i = 0; i < m_DummyPassengerArray.Length; i++)
+            {
+                m_DummyPassengerArray[i].gameObject.SetActive(false);
+            }
         }
 
         public void Initialize(ColorIDs color)
@@ -60,12 +65,19 @@ namespace Runtime.Gameplay
             MaterialPropertyBlock block = new();
             block.SetColor("_Color", color);
             m_Renderer.SetPropertyBlock(block, 0);
+
+            for (int i = 0; i < m_DummyPassengerArray.Length; i++)
+            {
+                m_DummyPassengerArray[i].SetColor(color);
+                m_DummyPassengerArray[i].gameObject.SetActive(false);
+            }
         }
 
         public int GetCurrentPassengerCount() => currentPassengers;
 
         public void AddPassenger(float checkDelay)
         {
+            m_DummyPassengerArray[currentPassengers - 1].gameObject.SetActive(true);
             if (IsFull)
             {
                 _checkTween?.Kill();
