@@ -47,6 +47,7 @@ namespace Runtime.Gameplay
                     PassengerBase passenger = PassengerPool.Get();
                     passenger.transform.position = waitingStickmanData.worldPosition;
                     passenger.SetStickmanData(waitingStickmanData);
+                    passenger.CheckCurrentBus();
                 }
             }
             else

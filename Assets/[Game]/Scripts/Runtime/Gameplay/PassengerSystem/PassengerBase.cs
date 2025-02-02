@@ -39,6 +39,16 @@ namespace Runtime.Gameplay
         }
         #endregion
 
+        public void CheckCurrentBus()
+        {
+            LevelManager.Instance.OnLevelStarted += onLevelStarted;
+        }
+        private void onLevelStarted()
+        {
+            LevelManager.Instance.OnLevelStarted -= onLevelStarted;
+            onVehicleBoarded();
+        }
+
         private void onLevelStartedLoading()
         {
             DOTween.Kill(gameObject);
