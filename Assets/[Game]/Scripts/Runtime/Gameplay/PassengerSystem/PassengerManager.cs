@@ -18,7 +18,7 @@ namespace Runtime.Gameplay
 
         public ObjectPoolBase<PassengerBase> PassengerPool { get; private set; }
 
-        private List<PassengerBase> _passengers = new();
+        public List<PassengerBase> Passengers { get; private set; } = new();
         private BoardManager GridManager => BoardManager.Instance;
         private WaitingAreaManager WaitingAreaManager => WaitingAreaManager.Instance;
 
@@ -32,8 +32,8 @@ namespace Runtime.Gameplay
 
         public void Initialize(LevelData data)
         {
-            if(_passengers.Count != 0)
-                _passengers.Clear();
+            if(Passengers.Count != 0)
+                Passengers.Clear();
 
             List<StickmanData> stickmen = data.stickmen;
             foreach (StickmanData stickman in stickmen)
@@ -46,14 +46,14 @@ namespace Runtime.Gameplay
 
         public void AddPassenger(PassengerBase passenger)
         {
-            if (_passengers.Contains(passenger)) return;
-            _passengers.Add(passenger);
+            if (Passengers.Contains(passenger)) return;
+            Passengers.Add(passenger);
         }
 
         public void RemovePassenger(PassengerBase passenger)
         {
-            if (!_passengers.Contains(passenger)) return;
-            _passengers.Remove(passenger);
+            if (!Passengers.Contains(passenger)) return;
+            Passengers.Remove(passenger);
             //if (_passengers.Count <= 0)
             //    LevelManager.Instance.CompleteLevel(true); //Can be ERROR!
         }
@@ -111,10 +111,10 @@ namespace Runtime.Gameplay
         #region Selectable Control
         private void CheckSelectables()
         {
-            List<PassengerBase> passengersTemp = new(_passengers);
+            List<PassengerBase> passengersTemp = new(Passengers);
             for (int i = 0; passengersTemp.Count > i; i++)
             {
-                PassengerBase passenger = _passengers[i];
+                PassengerBase passenger = Passengers[i];
                 Vector2Int passengerPos = passenger.Position;
                 if (passenger.IsSelectable)
                     continue;

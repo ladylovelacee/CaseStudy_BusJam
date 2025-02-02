@@ -10,7 +10,7 @@ namespace Runtime.Gameplay
 
         [SerializeField]
         private Transform[] waitingAreaPos = new Transform[WaitingSlotCount];
-        private List<StickmanData> _stickmanData = new();
+        public List<StickmanData> WaitingsData { get; private set; } = new();
         private int _currentAvailableSlotCount = WaitingSlotCount;
         public bool IsFull => _currentAvailableSlotCount <= 0;
 
@@ -22,7 +22,7 @@ namespace Runtime.Gameplay
         public void AddStickman(StickmanData stickmanData)
         {
             _currentAvailableSlotCount--;
-            _stickmanData.Add(stickmanData);
+            WaitingsData.Add(stickmanData);
 
             if(IsFull)
                 LevelManager.Instance.CompleteLevel(false);

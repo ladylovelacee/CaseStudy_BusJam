@@ -29,8 +29,14 @@ public class GameplaySaveSystem : MonoBehaviour
 
     public static void SaveGameplayData()
     {
-        List<StickmanData> currentStickmenDataList = new List<StickmanData>();
-        List<StickmanData> currentWaitingAreaStickmenDataList = new List<StickmanData>();
+        List<StickmanData> currentStickmenDataList = new();
+
+        foreach (var passenger in PassengerManager.Instance.Passengers)
+        {
+            currentStickmenDataList.Add(passenger.Data);
+        }
+
+        List<StickmanData> currentWaitingAreaStickmenDataList = WaitingAreaManager.Instance.WaitingsData;
         int currentBusOrderIndex = 0;
         int currentBusPassengerCount = 0;
         float currentGameTime = 0;
