@@ -1,6 +1,7 @@
 using DG.Tweening;
 using Runtime.Core;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Jobs;
@@ -104,11 +105,11 @@ namespace Runtime.Gameplay
                 WaitingAreaManager.Instance._currentAvailableSlotCount--;
             }
 
-            passenger.transform.DOPath(path.ToArray(), distance/1f).SetEase(Ease.Linear)
+            passenger.transform.DOPath(path.ToArray(), distance/.75f).SetEase(Ease.Linear)
                 .OnComplete(() =>
                 {
                     if (isBoarded)
-                        BoardPassenger(passenger);
+                        BoardPassenger(passenger, distance / .75f);
                     else
                         MoveToWaitingArea(passenger);
                 });
@@ -139,7 +140,7 @@ namespace Runtime.Gameplay
         #endregion
 
         #region Selectable Control
-        private void CheckSelectables()
+        private IEnumerator CoCheckSelectables()
         {
             List<PassengerBase> passengersTemp = new(Passengers);
             for (int i = 0; passengersTemp.Count > i; i++)
@@ -161,16 +162,28 @@ namespace Runtime.Gameplay
                         break;
                     }
                 }
+                yield return null;
             }
+        }
+        Coroutine checkCoroutine;
+        private void CheckSelectables()
+        {
+            if (checkCoroutine != null)
+            {
+                StopCoroutine(checkCoroutine);
+                checkCoroutine = null;
+            }
+
+            checkCoroutine = StartCoroutine(CoCheckSelectables());
         }
         #endregion
         public bool CanBoardVehicle(PassengerBase passenger)=> VehicleManager.Instance.CanPassengerBoard(passenger);
 
-        private void BoardPassenger(PassengerBase passenger)
+        private void BoardPassenger(PassengerBase passenger, float arriveTime)
         {
             OnPassengerBoarded?.Invoke(passenger);
             PassengerPool.Release(passenger);
-            VehicleManager.Instance.CurrentVehicle.AddPassenger();
+            VehicleManager.Instance.CurrentVehicle.AddPassenger(arriveTime);
         }
 
         private void MoveToWaitingArea(PassengerBase passenger)

@@ -50,7 +50,7 @@ namespace Runtime.Gameplay
                 for (int i = 0; GameplaySaveSystem.CurrentSaveData.LastBusPassengerCount>i; i++)
                 {
                     CurrentVehicle.currentPassengers++;
-                    CurrentVehicle.AddPassenger();
+                    CurrentVehicle.AddPassenger(0);
                 }
             }
             CurrentVehicle.transform.position = WaitPoint.position;

@@ -1,4 +1,5 @@
 using Runtime.Core;
+using System;
 using UnityEngine;
 
 namespace Runtime.Gameplay
@@ -27,6 +28,11 @@ namespace Runtime.Gameplay
 
         public void Initialize()
         {
+            if(WalkableArea != null)
+                Array.Clear(WalkableArea, 0, WalkableArea.Length);
+            if(Board != null)
+                Array.Clear(Board.grid, 0, Board.grid.Length);
+
             width = levelData.width; 
             height = levelData.height;
 

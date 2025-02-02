@@ -15,8 +15,9 @@ namespace Runtime.Gameplay
 
         private int maxCapacity = 3; // TODO: make generic
         public int currentPassengers = 0;
+        private Tween _checkTween;
 
-        private const float MoveDuration = 1;
+        private const float MoveDuration = 1.5f;
         private void OnEnable()
         {
             LevelManager.Instance.LevelLoader.OnLevelStartLoading += onLevelStartLoading;
@@ -46,7 +47,7 @@ namespace Runtime.Gameplay
         }
         private void Move(Vector3 target, float duration = 1, Action stopAction = null)
         {
-            transform.DOMove(target, MoveDuration)
+            transform.DOMove(target, MoveDuration).SetEase(Ease.InSine)
                 .OnComplete(()=>{
                     if(stopAction != null)
                         stopAction();
@@ -62,12 +63,17 @@ namespace Runtime.Gameplay
         }
 
         public int GetCurrentPassengerCount() => currentPassengers;
-        public void AddPassenger()
+
+        public void AddPassenger(float checkDelay)
         {
             if (IsFull)
             {
-                Move(Manager.FinishPoint.position);
-                Manager.OnVehicleFilled();
+                _checkTween?.Kill();
+                _checkTween = DOVirtual.DelayedCall(checkDelay, () =>
+                {
+                    Move(Manager.FinishPoint.position);
+                    Manager.OnVehicleFilled();
+                },false);
             }
         }
     }

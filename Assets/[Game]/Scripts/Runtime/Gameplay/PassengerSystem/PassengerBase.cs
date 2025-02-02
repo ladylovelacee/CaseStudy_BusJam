@@ -79,7 +79,7 @@ namespace Runtime.Gameplay
                 transform.DOMove(VehicleManager.Instance.CurrentVehicle.transform.position, .5f).SetEase(Ease.Linear)
                     .OnComplete(() =>
                     {
-                        VehicleManager.Instance.CurrentVehicle.AddPassenger();
+                        VehicleManager.Instance.CurrentVehicle.AddPassenger(.5f);
                         Manager.PassengerPool.Release(this);
                     }).SetLink(gameObject);
             }
