@@ -3,13 +3,16 @@ using UnityEngine;
 
 namespace Runtime.Gameplay
 {
-    public class GridManager : Singleton<GridManager>
+    public class BoardManager : Singleton<BoardManager>
     {
+        [SerializeField]
+        private Transform parent;
         public ObjectPoolBase<GridCell> CellPool {  get; private set; }
         public GridSystem<GridCell> Board { get; private set; }
         
         private float cellSize = 1;
         private Vector3 originPosition;
+        [HideInInspector]
         public int width, height;
 
         [HideInInspector]
@@ -24,10 +27,9 @@ namespace Runtime.Gameplay
             width = data.width; 
             height = data.height;
 
-            int walkableAreaSlotCount = width * height + WaitingAreaManager.MaxWaitingSlotWidth * WaitingAreaManager.MaxWaitingSlotHeight;
-            WalkableArea = new int[walkableAreaSlotCount];
+            WalkableArea = new int[width * height];
 
-            originPosition = new Vector3(-width/2f, 0, -height/2f);
+            originPosition = new Vector3(-width/2f, 0, -height);
             Board = new(width, height, originPosition, (int x, int y) => CreateCell(x,y));
         }
 
@@ -47,6 +49,8 @@ namespace Runtime.Gameplay
             cell.transform.position = GetWorldPosition(x,y);
 
             WalkableArea[x + (y * width)] = 1;
+
+            cell.transform.SetParent(parent);
             return cell;
         }
     }

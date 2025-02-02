@@ -19,7 +19,9 @@ namespace Runtime.Gameplay
         public ObjectPoolBase<PassengerBase> PassengerPool { get; private set; }
 
         private List<PassengerBase> _passengers = new();
-        private GridManager GridManager => GridManager.Instance;
+        private BoardManager GridManager => BoardManager.Instance;
+        private WaitingAreaManager WaitingAreaManager => WaitingAreaManager.Instance;
+
         private int waitingAreaSlots = 3;
         private int currentWaitingCount = 0;
 
@@ -61,7 +63,7 @@ namespace Runtime.Gameplay
             Vector3 position = GridManager.GetWorldPosition(stickman.position.x, stickman.position.y);
             PassengerBase passenger = PassengerPool.Get();
             passenger.transform.position = position;
-            passenger.Initialize(stickman.stickmanColor, stickman.position);
+            passenger.SetStickmanData(stickman);
             AddPassenger(passenger);
 
             GridManager.SetCellWalkable(stickman.position.x, stickman.position.y, false);
@@ -69,21 +71,16 @@ namespace Runtime.Gameplay
 
         public void HandlePassengerSelection(PassengerBase passenger)
         {
+            if (WaitingAreaManager.IsFull)
+                return;
+
             passenger.transform.DOPath(FindPath(passenger.Position, passenger.TargetPos).ToArray(), 2f)
                 .OnComplete(() =>
                 {
                     if (CanBoardVehicle(passenger))
-                    {
                         BoardPassenger(passenger);
-                    }
-                    else if (currentWaitingCount < waitingAreaSlots)
-                    {
-                        MoveToWaitingArea(passenger);
-                    }
                     else
-                    {
-                        LevelManager.Instance.CompleteLevel(false);
-                    }
+                        MoveToWaitingArea(passenger);
                 });
 
             CheckSelectables();           
@@ -147,10 +144,9 @@ namespace Runtime.Gameplay
 
         private void MoveToWaitingArea(PassengerBase passenger)
         {
-            currentWaitingCount++;
-            OnPassengerMovedToWaitingArea?.Invoke(passenger);
-            if(currentWaitingCount >= waitingAreaSlots)
-                LevelManager.Instance.CompleteLevel(false);
+            Vector3 pos = WaitingAreaManager.Instance.GetAvailableTilePos();
+            WaitingAreaManager.Instance.AddStickman(passenger.Data);
+            passenger.transform.DOMove(pos, .5f);
         }
     }
 }

@@ -51,7 +51,7 @@ namespace Runtime.Gameplay
                         pathNode.hCost = CalculateDistanceCost(new int2(x, y), endPosition);
                         pathNode.CalculateFCost();
 
-                        pathNode.isWalkable = GridManager.Instance.WalkableArea[pathNode.index] == 1 ? true : false;
+                        pathNode.isWalkable = BoardManager.Instance.WalkableArea[pathNode.index] == 1 ? true : false;
                         pathNode.cameFromNodeIndex = -1;
                         pathNodeArray[pathNode.index] = pathNode;
 
