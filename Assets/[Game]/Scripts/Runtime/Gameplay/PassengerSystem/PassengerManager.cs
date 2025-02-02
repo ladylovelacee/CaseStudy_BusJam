@@ -89,7 +89,7 @@ namespace Runtime.Gameplay
 
             GridManager.SetCellWalkable(passenger.Data.position.x, passenger.Data.position.y, true);
 
-            float distance = Vector2Int.Distance(passenger.Data.position, passenger.TargetBoardPos);
+            //float distance = Vector2Int.Distance(passenger.Data.position, passenger.TargetBoardPos);
             List<Vector3> path = FindPath(passenger.Data.position, passenger.TargetBoardPos);
             Vector3 tilePos = WaitingAreaManager.GetAvailableTilePos();
             path.Add(tilePos);
@@ -105,11 +105,11 @@ namespace Runtime.Gameplay
                 WaitingAreaManager.Instance._currentAvailableSlotCount--;
             }
 
-            passenger.transform.DOPath(path.ToArray(), distance/.75f).SetEase(Ease.Linear)
+            passenger.transform.DOPath(path.ToArray(), 1).SetEase(Ease.Linear)
                 .OnComplete(() =>
                 {
                     if (isBoarded)
-                        BoardPassenger(passenger, distance / .75f);
+                        BoardPassenger(passenger, 1);
                     else
                         MoveToWaitingArea(passenger);
                 });

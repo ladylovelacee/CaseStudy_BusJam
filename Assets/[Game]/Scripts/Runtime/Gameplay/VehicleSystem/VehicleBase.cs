@@ -16,6 +16,7 @@ namespace Runtime.Gameplay
 
         private int maxCapacity = 3; // TODO: make generic
         public int currentPassengers = 0;
+        private int _dummyPassengerIndex = 0;
         private Tween _checkTween;
 
         private const float MoveDuration = 1.5f;
@@ -40,6 +41,7 @@ namespace Runtime.Gameplay
         public void Initialize(ColorIDs color)
         {
             currentPassengers = 0;
+            _dummyPassengerIndex = 0;
             ColorID = color;
             VisualSetup();
             Move(Manager.WaitPoint.position, MoveDuration, onVehicleBoarded);
@@ -77,15 +79,16 @@ namespace Runtime.Gameplay
 
         public void AddPassenger(float checkDelay)
         {
-            m_DummyPassengerArray[currentPassengers - 1].gameObject.SetActive(true);
-            if (IsFull)
+            m_DummyPassengerArray[_dummyPassengerIndex].gameObject.SetActive(true);
+            _dummyPassengerIndex++;
+            if (_dummyPassengerIndex >= m_DummyPassengerArray.Length)
             {
                 _checkTween?.Kill();
-                _checkTween = DOVirtual.DelayedCall(checkDelay, () =>
+                _checkTween = DOVirtual.DelayedCall(checkDelay != 0 ? .25f : 0, () =>
                 {
                     Move(Manager.FinishPoint.position);
                     Manager.OnVehicleFilled();
-                },false);
+                }, false);
             }
         }
     }
