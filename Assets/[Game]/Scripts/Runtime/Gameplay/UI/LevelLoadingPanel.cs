@@ -2,11 +2,12 @@ using Runtime.Core;
 
 namespace Runtime.Gameplay
 {
-    public class LevelEndPanel : PanelBase
+    public class LevelLoadingPanel : PanelBase
     {
         private void OnEnable()
         {
             LevelManager.Instance.OnLevelCompleted += onLevelCompleted;
+            LevelManager.Instance.LevelLoader.OnLevelLoaded += onLevelLoaded;
         }
 
         private void onLevelCompleted()
@@ -15,10 +16,16 @@ namespace Runtime.Gameplay
             LevelManager.Instance.LevelLoader.LoadLevel();
         }
 
+        private void onLevelLoaded()
+        {
+            ClosePanel();
+        }
+
         public override void Dispose()
         {
             base.Dispose();
             LevelManager.Instance.OnLevelCompleted -= onLevelCompleted;
+            LevelManager.Instance.LevelLoader.OnLevelLoaded -= onLevelLoaded;
         }
     }
 }

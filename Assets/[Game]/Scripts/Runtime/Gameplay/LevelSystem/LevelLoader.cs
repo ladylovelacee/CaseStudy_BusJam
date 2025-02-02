@@ -8,6 +8,7 @@ namespace Runtime.Gameplay
     public class LevelLoader : MonoBehaviour
     {
         public event Action OnLevelStartLoading;
+        public event Action OnLevelLoaded;
 
         public static LevelData CurrentLevelData;
         private LevelManager LevelManager => LevelManager.Instance;
@@ -23,6 +24,8 @@ namespace Runtime.Gameplay
             PassengerManager.Instance.Initialize();
             VehicleManager.Instance.Initialize();
             WaitingAreaManager.Instance.Initialize();
+
+            OnLevelLoaded?.Invoke();
         }
 
         public void LoadLevel() 
