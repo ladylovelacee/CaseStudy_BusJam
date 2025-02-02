@@ -6,6 +6,7 @@ using Unity.Collections;
 using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Runtime.Gameplay
 {
@@ -38,7 +39,18 @@ namespace Runtime.Gameplay
             List<StickmanData> stickmen = new();
 
             if (GameplaySaveSystem.CurrentSaveData != null)
+            {
                 stickmen = GameplaySaveSystem.CurrentSaveData.LastStickmenDataList;
+
+                // Waiting passengers.
+                for (int i = 0; i < GameplaySaveSystem.CurrentSaveData.LastWaitingAreaStickmenDataList.Count; i++)
+                {
+                    StickmanData waitingStickmanData = GameplaySaveSystem.CurrentSaveData.LastWaitingAreaStickmenDataList[i];
+                    PassengerBase passenger = PassengerPool.Get();
+                    passenger.transform.position = waitingStickmanData.worldPosition;
+                    passenger.SetStickmanData(waitingStickmanData);
+                }
+            }
             else
                 stickmen = data.stickmen;
 
@@ -152,6 +164,7 @@ namespace Runtime.Gameplay
             Vector3 pos = WaitingAreaManager.Instance.GetAvailableTilePos();
             WaitingAreaManager.Instance.AddStickman(passenger.Data);
             passenger.transform.DOMove(pos, .5f);
+            passenger.Data.worldPosition = pos;
         }
     }
 }

@@ -16,6 +16,7 @@ namespace Runtime.Gameplay
             BoardManager.Instance.Initialize(level);
             PassengerManager.Instance.Initialize(level);
             VehicleManager.Instance.Initialize(level);
+            WaitingAreaManager.Instance.Initialize(level);
         }
     }
 }

@@ -1,3 +1,4 @@
+using Runtime.Core;
 using Runtime.Gameplay;
 using System;
 using System.Collections.Generic;
@@ -30,6 +31,9 @@ public class GameplaySaveSystem : MonoBehaviour
 
     public static void SaveGameplayData()
     {
+        if (!LevelManager.Instance.IsLevelStarted)
+            return;
+
         List<StickmanData> currentStickmenDataList = new();
 
         foreach (var passenger in PassengerManager.Instance.Passengers)

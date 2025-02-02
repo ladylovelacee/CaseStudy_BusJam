@@ -22,6 +22,7 @@ namespace Runtime.Gameplay
 
         public void SetStickmanData(StickmanData data)
         {
+            Data = data;
             Initialize(data.stickmanColor, data.position);
         }
 

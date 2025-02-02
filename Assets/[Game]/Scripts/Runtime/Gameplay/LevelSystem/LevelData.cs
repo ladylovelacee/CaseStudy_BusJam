@@ -16,6 +16,7 @@ namespace Runtime.Gameplay
     public class StickmanData
     {
         public Vector2Int position;
+        public Vector3 worldPosition;
         public ColorIDs stickmanColor;
     }
 
