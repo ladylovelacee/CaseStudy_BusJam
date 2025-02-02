@@ -1,4 +1,6 @@
+using DG.Tweening;
 using Runtime.Core;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,6 +8,8 @@ namespace Runtime.Gameplay
 {
     public class VehicleManager : Singleton<VehicleManager>
     {
+        public event Action OnVehicleBoarded;
+
         [field:SerializeField] public Transform WaitPoint { get; private set; }
         [field:SerializeField] public Transform FinishPoint { get; private set; }
         public VehicleBase CurrentVehicle { get; private set; }
@@ -21,6 +25,7 @@ namespace Runtime.Gameplay
         {
             Pool = new(vehicleInstance);
         }
+
         public void Initialize()
         {
             List<VehicleData> vehicleDatas = new();
@@ -39,11 +44,13 @@ namespace Runtime.Gameplay
         private void SpawnFirstVehicle()
         {
             SpawnNextVehicle();
+            DOTween.Kill(CurrentVehicle.gameObject);
             if (GameplaySaveSystem.CurrentSaveData != null)
             {
                 for (int i = 0; GameplaySaveSystem.CurrentSaveData.LastBusPassengerCount>i; i++) 
                     CurrentVehicle.AddPassenger();
             }
+            CurrentVehicle.transform.position = WaitPoint.position;
         }
 
         private void SpawnNextVehicle()
@@ -59,7 +66,7 @@ namespace Runtime.Gameplay
         }
 
         public bool CanPassengerBoard(PassengerBase passenger)=> passenger.Data.stickmanColor.Equals(CurrentVehicle.ColorID) && !CurrentVehicle.IsFull;
-        public void OnBusFilled()
+        public void OnVehicleFilled()
         {
             if (CurrentVehicle != null)
             {
@@ -67,6 +74,11 @@ namespace Runtime.Gameplay
                 CurrentVehicle = null;
                 SpawnNextVehicle();
             }
+        }
+
+        public void OnVehicleWaitForPassengers()
+        {
+            OnVehicleBoarded?.Invoke();
         }
     }
 }

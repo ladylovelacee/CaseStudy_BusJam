@@ -16,7 +16,7 @@ namespace Runtime.Gameplay
         private int maxCapacity = 3; // TODO: make generic
         private int currentPassengers = 0;
 
-        private const float MoveDuration = 2.0f;
+        private const float MoveDuration = 1;
         private void OnEnable()
         {
             LevelManager.Instance.LevelLoader.OnLevelStartLoading += onLevelStartLoading;
@@ -35,11 +35,16 @@ namespace Runtime.Gameplay
         {
             ColorID = color;
             VisualSetup();
-            Move(Manager.WaitPoint.position);
+            Move(Manager.WaitPoint.position, MoveDuration,Manager.OnVehicleWaitForPassengers);
         }
-        private void Move(Vector3 target)
+
+        private void Move(Vector3 target, float duration = 1, Action stopAction = null)
         {
-            transform.DOMove(target, MoveDuration);
+            transform.DOMove(target, MoveDuration)
+                .OnComplete(()=>{
+                    if(stopAction != null)
+                        stopAction();
+            }).SetLink(gameObject);
         }
         
         private void VisualSetup()
@@ -47,7 +52,7 @@ namespace Runtime.Gameplay
             Color color = DataManager.Instance.ColorContainer.GetColorById(ColorID);
             MaterialPropertyBlock block = new();
             block.SetColor("_Color", color);
-            m_Renderer.SetPropertyBlock(block);
+            m_Renderer.SetPropertyBlock(block, 0);
         }
 
         public int GetCurrentPassengerCount() => currentPassengers;
@@ -58,7 +63,7 @@ namespace Runtime.Gameplay
             if (IsFull)
             {
                 Move(Manager.FinishPoint.position);
-                Manager.OnBusFilled();
+                Manager.OnVehicleFilled();
             }
         }
     }
