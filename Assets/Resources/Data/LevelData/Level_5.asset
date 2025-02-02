@@ -10,62 +10,55 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a77fc43faffeacb4daa55b950fa6f7aa, type: 3}
-  m_Name: DummyLevel
+  m_Name: Level_5
   m_EditorClassIdentifier: 
-  width: 10
-  height: 10
+  duration: 80
+  width: 4
+  height: 3
   stickmen:
-  - position: {x: 4, y: 9}
+  - position: {x: 0, y: 0}
     worldPosition: {x: 0, y: 0, z: 0}
-    stickmanColor: 0
-  - position: {x: 4, y: 7}
+    stickmanColor: 1
+  - position: {x: 1, y: 1}
     worldPosition: {x: 0, y: 0, z: 0}
-    stickmanColor: 0
+    stickmanColor: 1
+  - position: {x: 2, y: 0}
+    worldPosition: {x: 0, y: 0, z: 0}
+    stickmanColor: 1
+  - position: {x: 1, y: 0}
+    worldPosition: {x: 0, y: 0, z: 0}
+    stickmanColor: 3
   - position: {x: 3, y: 0}
     worldPosition: {x: 0, y: 0, z: 0}
-    stickmanColor: 1
-  - position: {x: 1, y: 4}
+    stickmanColor: 3
+  - position: {x: 0, y: 1}
     worldPosition: {x: 0, y: 0, z: 0}
-    stickmanColor: 1
-  - position: {x: 5, y: 4}
-    worldPosition: {x: 0, y: 0, z: 0}
-    stickmanColor: 1
-  - position: {x: 2, y: 6}
-    worldPosition: {x: 0, y: 0, z: 0}
-    stickmanColor: 1
-  - position: {x: 1, y: 7}
-    worldPosition: {x: 0, y: 0, z: 0}
-    stickmanColor: 1
-  - position: {x: 3, y: 1}
-    worldPosition: {x: 0, y: 0, z: 0}
-    stickmanColor: 1
+    stickmanColor: 3
   - position: {x: 2, y: 1}
     worldPosition: {x: 0, y: 0, z: 0}
-    stickmanColor: 1
+    stickmanColor: 0
+  - position: {x: 1, y: 2}
+    worldPosition: {x: 0, y: 0, z: 0}
+    stickmanColor: 0
+  - position: {x: 2, y: 2}
+    worldPosition: {x: 0, y: 0, z: 0}
+    stickmanColor: 0
+  - position: {x: 0, y: 2}
+    worldPosition: {x: 0, y: 0, z: 0}
+    stickmanColor: 2
+  - position: {x: 3, y: 1}
+    worldPosition: {x: 0, y: 0, z: 0}
+    stickmanColor: 2
   - position: {x: 3, y: 2}
     worldPosition: {x: 0, y: 0, z: 0}
-    stickmanColor: 1
-  - position: {x: 4, y: 1}
-    worldPosition: {x: 0, y: 0, z: 0}
-    stickmanColor: 1
-  - position: {x: 9, y: 0}
-    worldPosition: {x: 0, y: 0, z: 0}
-    stickmanColor: 1
-  - position: {x: 8, y: 0}
-    worldPosition: {x: 0, y: 0, z: 0}
-    stickmanColor: 1
-  - position: {x: 7, y: 0}
-    worldPosition: {x: 0, y: 0, z: 0}
-    stickmanColor: 1
-  - position: {x: 9, y: 1}
-    worldPosition: {x: 0, y: 0, z: 0}
-    stickmanColor: 1
-  - position: {x: 8, y: 1}
-    worldPosition: {x: 0, y: 0, z: 0}
-    stickmanColor: 1
+    stickmanColor: 2
   obstacles: []
   busQueue:
-  - colorId: 4
-    arrivalOrder: 1
   - colorId: 1
+    arrivalOrder: 1
+  - colorId: 3
     arrivalOrder: 2
+  - colorId: 0
+    arrivalOrder: 3
+  - colorId: 2
+    arrivalOrder: 4

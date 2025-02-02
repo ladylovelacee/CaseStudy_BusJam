@@ -188,8 +188,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Levels:
-  - {fileID: 11400000, guid: 85ed21b3ee4474b42b794fc52cdd2e4e, type: 2}
-  - {fileID: 11400000, guid: c3b4ca277530c494c880727669cb5d9a, type: 2}
+  - {fileID: 11400000, guid: 11241ded1d63a9240936cb1dc69bafcd, type: 2}
+  - {fileID: 11400000, guid: 505b4e087481ccb4183424fd6d7fc371, type: 2}
+  - {fileID: 11400000, guid: f4a6f07ed060b5b4394e569c4741bc39, type: 2}
+  - {fileID: 11400000, guid: ac9ee1ba3dbc2e043bf66e9c3a7928a6, type: 2}
+  - {fileID: 11400000, guid: f9499fc46242e08479dabca22337a8f8, type: 2}
   LevelLoader: {fileID: 1855206223}
 --- !u!114 &169981369
 MonoBehaviour:
@@ -1857,7 +1860,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95304c4db4d70b340bacab4a30076d2c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TimerDuration: 60
   timerVisual: {fileID: 1269570138}
   txtRemained: {fileID: 637638207}
 --- !u!114 &1577508484

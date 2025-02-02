@@ -13,6 +13,7 @@ public class LevelEditor : EditorWindow
 
     private static int _width;
     private static int _height;
+    private static int _levelDuration;
     private static string _currentLevelName;
     private static string _lastLoadedLevelName;
     private static int _selectedLevelDataIndex;
@@ -22,6 +23,7 @@ public class LevelEditor : EditorWindow
     private readonly static string LevelPathString = "Assets/Resources/Data/LevelData/";
     private readonly static string LevelDataInstancePathString = "Assets/[Game]/Scripts/Level_Data_Instance.asset";
     private readonly static string LevelEditorScenePathString = "Assets/[Game]/Scenes/LevelEditorScene.unity";
+    private readonly static string MainScenePathString = "Assets/[Game]/Scenes/Game.unity";
 
 
     [MenuItem("Tools/Level Editor")]
@@ -43,14 +45,17 @@ public class LevelEditor : EditorWindow
         if (!IsInLevelEditorScene())
             return;
 
-        if (GUILayout.Button("Reload Editor Tool"))
+        if (GUILayout.Button("Go to game main scene to play", GUILayout.Height(50)))
+        {
+            EditorSceneManager.OpenScene(MainScenePathString);
+        }
+
+        if (GUILayout.Button("Reload Editor Tool", GUILayout.Height(50)))
         {
             ClearEditor();
         }
 
         _scrollPos = EditorGUILayout.BeginScrollView(_scrollPos);
-
-        //levelData = (LevelData)EditorGUILayout.ObjectField("Level Data", levelData, typeof(LevelData), false);
 
         DrawWidthAndHeight();
         DrawLevelDataTool();
@@ -240,6 +245,9 @@ public class LevelEditor : EditorWindow
         EditorGUILayout.LabelField("Level Name");
         _currentLevelName = EditorGUILayout.TextField(_currentLevelName);
 
+        EditorGUILayout.LabelField("Level Duration");
+        _levelDuration = EditorGUILayout.IntField(_levelDuration);
+
         EditorGUILayout.Space(10);
 
         EditorGUILayout.BeginVertical();
@@ -284,6 +292,7 @@ public class LevelEditor : EditorWindow
         isNewLevel = currentLevelData == null;
         _instanceLevelData.height = _height;
         _instanceLevelData.width = _width;
+        _instanceLevelData.duration = _levelDuration;
 
         if (isNewLevel)
         {
@@ -374,6 +383,7 @@ public class LevelEditor : EditorWindow
         _lastLoadedLevelName = "";
         _width = 0;
         _height = 0;
+        _levelDuration = 0;
         Initialize();
 
         Debug.Log("Level Cleared!");
