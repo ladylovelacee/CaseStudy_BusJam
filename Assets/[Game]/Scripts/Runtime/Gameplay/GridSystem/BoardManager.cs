@@ -1,5 +1,6 @@
 using Runtime.Core;
 using System;
+using Unity.Collections;
 using UnityEngine;
 
 namespace Runtime.Gameplay
@@ -17,7 +18,7 @@ namespace Runtime.Gameplay
         public int width, height;
 
         [HideInInspector]
-        public int[] WalkableArea {  get; private set; }
+        public NativeArray<int> WalkableArea;
 
         LevelData levelData => LevelLoader.CurrentLevelData;
 
@@ -29,14 +30,14 @@ namespace Runtime.Gameplay
         public void Initialize()
         {
             if(WalkableArea != null)
-                Array.Clear(WalkableArea, 0, WalkableArea.Length);
+                WalkableArea.Dispose();
             if(Board != null)
                 Array.Clear(Board.grid, 0, Board.grid.Length);
 
             width = levelData.width; 
             height = levelData.height;
 
-            WalkableArea = new int[width * height];
+            WalkableArea = new NativeArray<int>(width * height, Allocator.Persistent);
 
             originPosition = new Vector3(-width/2f, 0, -height);
             Board = new(width, height, originPosition, (int x, int y) => CreateCell(x,y));

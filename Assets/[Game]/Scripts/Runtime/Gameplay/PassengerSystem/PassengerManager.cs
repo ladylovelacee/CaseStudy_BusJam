@@ -123,7 +123,7 @@ namespace Runtime.Gameplay
         #region Movement Control
         private List<Vector3> FindPath(Vector2Int startPos,Vector2Int targetPos)
         {
-            JobHandle handle = Pathfinding.FindPath(new int2(GridManager.width, GridManager.height), new int2(startPos.x, startPos.y), new int2(targetPos.x, targetPos.y), out NativeList<int2> path);
+            JobHandle handle = Pathfinding.FindPath(new int2(GridManager.width, GridManager.height), new int2(startPos.x, startPos.y), new int2(targetPos.x, targetPos.y), GridManager.WalkableArea,out NativeList<int2> path);
             handle.Complete();
             List<Vector3> findedPath = new();
             for (int i = path.Length - 1; i >= 0; i--)
@@ -136,7 +136,7 @@ namespace Runtime.Gameplay
 
         private bool IsPathAvailable(Vector2Int startPos, Vector2Int targetPos)
         {
-            JobHandle handle = Pathfinding.FindPath(new int2(GridManager.width, GridManager.height), new int2(startPos.x, startPos.y), new int2(targetPos.x, targetPos.y), out NativeList<int2> path);
+            JobHandle handle = Pathfinding.FindPath(new int2(GridManager.width, GridManager.height), new int2(startPos.x, startPos.y), new int2(targetPos.x, targetPos.y), GridManager.WalkableArea,out NativeList<int2> path);
             handle.Complete();
             return path.Length == 0 ? false : true;
         }
