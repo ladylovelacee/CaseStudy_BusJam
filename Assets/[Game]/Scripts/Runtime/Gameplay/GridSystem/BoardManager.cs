@@ -1,4 +1,6 @@
 using Runtime.Core;
+using System;
+using Unity.Collections;
 using UnityEngine;
 
 namespace Runtime.Gameplay
@@ -16,18 +18,26 @@ namespace Runtime.Gameplay
         public int width, height;
 
         [HideInInspector]
-        public int[] WalkableArea {  get; private set; }
+        public NativeArray<int> WalkableArea;
+
+        LevelData levelData => LevelLoader.CurrentLevelData;
+
         private void Awake()
         {
             CellPool = new(DataManager.Instance.InstanceContainer.Cell);
         }
 
-        public void Initialize(LevelData data)
+        public void Initialize()
         {
-            width = data.width; 
-            height = data.height;
+            if(WalkableArea != null)
+                WalkableArea.Dispose();
+            if(Board != null)
+                Array.Clear(Board.grid, 0, Board.grid.Length);
 
-            WalkableArea = new int[width * height];
+            width = levelData.width; 
+            height = levelData.height;
+
+            WalkableArea = new NativeArray<int>(width * height, Allocator.Persistent);
 
             originPosition = new Vector3(-width/2f, 0, -height);
             Board = new(width, height, originPosition, (int x, int y) => CreateCell(x,y));
@@ -44,8 +54,6 @@ namespace Runtime.Gameplay
         private GridCell CreateCell(int x, int y)
         {
             GridCell cell = CellPool.Get();
-            cell.x = x;
-            cell.y = y;
             cell.transform.position = GetWorldPosition(x,y);
 
             WalkableArea[x + (y * width)] = 1;

@@ -1,12 +1,12 @@
 using DG.Tweening;
 using Runtime.Core;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace Runtime.Gameplay
 {
@@ -18,20 +18,18 @@ namespace Runtime.Gameplay
         #endregion
 
         public ObjectPoolBase<PassengerBase> PassengerPool { get; private set; }
-
         public List<PassengerBase> Passengers { get; private set; } = new();
         private BoardManager GridManager => BoardManager.Instance;
         private WaitingAreaManager WaitingAreaManager => WaitingAreaManager.Instance;
 
-        private int waitingAreaSlots = 3;
-        private int currentWaitingCount = 0;
+        private LevelData levelData => LevelLoader.CurrentLevelData;
 
         private void Awake()
         {
             PassengerPool = new ObjectPoolBase<PassengerBase>(DataManager.Instance.InstanceContainer.Passenger);
         }
 
-        public void Initialize(LevelData data)
+        public void Initialize()
         {
             if(Passengers.Count != 0)
                 Passengers.Clear();
@@ -42,17 +40,18 @@ namespace Runtime.Gameplay
             {
                 stickmen = GameplaySaveSystem.CurrentSaveData.LastStickmenDataList;
 
-                // Waiting passengers.
+                // Load waiting passengers
                 for (int i = 0; i < GameplaySaveSystem.CurrentSaveData.LastWaitingAreaStickmenDataList.Count; i++)
                 {
                     StickmanData waitingStickmanData = GameplaySaveSystem.CurrentSaveData.LastWaitingAreaStickmenDataList[i];
                     PassengerBase passenger = PassengerPool.Get();
                     passenger.transform.position = waitingStickmanData.worldPosition;
                     passenger.SetStickmanData(waitingStickmanData);
+                    passenger.CheckCurrentBus();
                 }
             }
             else
-                stickmen = data.stickmen;
+                stickmen = levelData.stickmen;
 
             foreach (StickmanData stickman in stickmen)
             {
@@ -71,8 +70,6 @@ namespace Runtime.Gameplay
         {
             if (!Passengers.Contains(passenger)) return;
             Passengers.Remove(passenger);
-            //if (_passengers.Count <= 0)
-            //    LevelManager.Instance.CompleteLevel(true); //Can be ERROR!
         }
 
         public void CreatePassenger(StickmanData stickman)
@@ -91,22 +88,42 @@ namespace Runtime.Gameplay
             if (WaitingAreaManager.IsFull)
                 return;
 
-            passenger.transform.DOPath(FindPath(passenger.Position, passenger.TargetPos).ToArray(), 2f)
+            GridManager.SetCellWalkable(passenger.Data.position.x, passenger.Data.position.y, true);
+
+            //float distance = Vector2Int.Distance(passenger.Data.position, passenger.TargetBoardPos);
+            List<Vector3> path = FindPath(passenger.Data.position, passenger.TargetBoardPos);
+            Vector3 tilePos = WaitingAreaManager.GetAvailableTilePos();
+            path.Add(tilePos);
+            bool isBoarded = CanBoardVehicle(passenger);
+            if (isBoarded)
+            {
+                path.Add(VehicleManager.Instance.CurrentVehicle.transform.position);
+                VehicleManager.Instance.CurrentVehicle.currentPassengers++;
+            }
+            else
+            {
+                passenger.Data.worldPosition = tilePos;
+                passenger.StartPeeking();
+
+                WaitingAreaManager.Instance._currentAvailableSlotCount--;
+            }
+
+            passenger.transform.DOPath(path.ToArray(), 1).SetEase(Ease.Linear)
                 .OnComplete(() =>
                 {
-                    if (CanBoardVehicle(passenger))
-                        BoardPassenger(passenger);
+                    if (isBoarded)
+                        BoardPassenger(passenger, 1);
                     else
                         MoveToWaitingArea(passenger);
                 });
 
-            CheckSelectables();           
+            CheckSelectables();
         }
 
         #region Movement Control
         private List<Vector3> FindPath(Vector2Int startPos,Vector2Int targetPos)
         {
-            JobHandle handle = Pathfinding.FindPath(new int2(GridManager.width, GridManager.height), new int2(startPos.x, startPos.y), new int2(targetPos.x, targetPos.y), out NativeList<int2> path);
+            JobHandle handle = Pathfinding.FindPath(new int2(GridManager.width, GridManager.height), new int2(startPos.x, startPos.y), new int2(targetPos.x, targetPos.y), GridManager.WalkableArea,out NativeList<int2> path);
             handle.Complete();
             List<Vector3> findedPath = new();
             for (int i = path.Length - 1; i >= 0; i--)
@@ -119,22 +136,27 @@ namespace Runtime.Gameplay
 
         private bool IsPathAvailable(Vector2Int startPos, Vector2Int targetPos)
         {
-            JobHandle handle = Pathfinding.FindPath(new int2(GridManager.width, GridManager.height), new int2(startPos.x, startPos.y), new int2(targetPos.x, targetPos.y), out NativeList<int2> path);
+            JobHandle handle = Pathfinding.FindPath(new int2(GridManager.width, GridManager.height), new int2(startPos.x, startPos.y), new int2(targetPos.x, targetPos.y), GridManager.WalkableArea,out NativeList<int2> path);
             handle.Complete();
             return path.Length == 0 ? false : true;
         }
         #endregion
 
         #region Selectable Control
-        private void CheckSelectables()
+        private IEnumerator CoCheckSelectables()
         {
             List<PassengerBase> passengersTemp = new(Passengers);
             for (int i = 0; passengersTemp.Count > i; i++)
             {
                 PassengerBase passenger = Passengers[i];
-                Vector2Int passengerPos = passenger.Position;
+                Vector2Int passengerPos = passenger.Data.position;
                 if (passenger.IsSelectable)
                     continue;
+                if (!BoardManager.Instance.Board.IsValidGridPosition(passenger.Data.position.x, passenger.Data.position.y + 1))
+                {
+                    passenger.TargetBoardPos = passengerPos;
+                    passenger.SetPassengerSelectable(true);
+                }
 
                 for (int j = 0; j < GridManager.width; j++)
                 {
@@ -142,29 +164,37 @@ namespace Runtime.Gameplay
                     if (IsPathAvailable(passengerPos, gridPos))
                     {
                         passenger.SetPassengerSelectable(true);
-                        passenger.TargetPos = gridPos;
+                        passenger.TargetBoardPos = gridPos;
                         break;
                     }
                 }
+                yield return null;
             }
         }
-        #endregion
-        private bool CanBoardVehicle(PassengerBase passenger)=> VehicleManager.Instance.CanPassengerBoard(passenger);
+        Coroutine checkCoroutine;
+        private void CheckSelectables()
+        {
+            if (checkCoroutine != null)
+            {
+                StopCoroutine(checkCoroutine);
+                checkCoroutine = null;
+            }
 
-        private void BoardPassenger(PassengerBase passenger)
+            checkCoroutine = StartCoroutine(CoCheckSelectables());
+        }
+        #endregion
+        public bool CanBoardVehicle(PassengerBase passenger)=> VehicleManager.Instance.CanPassengerBoard(passenger);
+
+        private void BoardPassenger(PassengerBase passenger, float arriveTime)
         {
             OnPassengerBoarded?.Invoke(passenger);
-            passenger.transform.SetParent(VehicleManager.Instance.CurrentVehicle.transform);
-            passenger.transform.DOMove(VehicleManager.Instance.CurrentVehicle.transform.position, .5f)
-                .OnComplete(VehicleManager.Instance.CurrentVehicle.AddPassenger);
+            PassengerPool.Release(passenger);
+            VehicleManager.Instance.CurrentVehicle.AddPassenger(arriveTime);
         }
 
         private void MoveToWaitingArea(PassengerBase passenger)
         {
-            Vector3 pos = WaitingAreaManager.Instance.GetAvailableTilePos();
             WaitingAreaManager.Instance.AddStickman(passenger.Data);
-            passenger.transform.DOMove(pos, .5f);
-            passenger.Data.worldPosition = pos;
         }
     }
 }

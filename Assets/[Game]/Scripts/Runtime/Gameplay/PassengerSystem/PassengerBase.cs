@@ -1,36 +1,65 @@
+using DG.Tweening;
+using Runtime.Core;
+using System;
 using UnityEngine;
 
 namespace Runtime.Gameplay
 {
     public class PassengerBase : MonoBehaviour, ISelectable
     {
+        #region Properties
         [field: SerializeField] public Renderer Renderer { get; private set; }
-        public PassengerColor PassengerColor { get; private set; }
-        public Vector2Int Position { get; private set; }
-
         public bool IsSelectable { get; private set; } = false;
-        public Vector2Int TargetPos;
-        private PassengerManager Manager => PassengerManager.Instance;
         public StickmanData Data { get; private set; }
+        private PassengerManager Manager => PassengerManager.Instance;
+        #endregion
 
-        public ColorIDs _colorId;
+        public Vector2Int TargetBoardPos;
+        private PassengerVisual _passengerVisual;
 
+        #region Methods From MonoBehaviour
         private void Awake()
         {
-            PassengerColor = new(this);
+            _passengerVisual = new(this);
+        }
+
+        private void OnEnable()
+        {
+            LevelManager.Instance.LevelLoader.OnLevelStartLoading += onLevelStartedLoading;
+        }
+
+        private void OnDisable()
+        {
+            DOTween.Kill(gameObject);
+
+            SetPassengerSelectable(false);
+            VehicleManager.Instance.OnVehicleBoarded -= onVehicleBoarded;
+
+            LevelManager.Instance.LevelLoader.OnLevelStartLoading -= onLevelStartedLoading;
+        }
+        #endregion
+
+        public void CheckCurrentBus()
+        {
+            LevelManager.Instance.OnLevelStarted += onLevelStarted;
+            StartPeeking();
+        }
+        private void onLevelStarted()
+        {
+            LevelManager.Instance.OnLevelStarted -= onLevelStarted;
+            onVehicleBoarded();
+        }
+
+        private void onLevelStartedLoading()
+        {
+            DOTween.Kill(gameObject);
+            Manager.PassengerPool.Release(this);
         }
 
         public void SetStickmanData(StickmanData data)
         {
             Data = data;
-            Initialize(data.stickmanColor, data.position);
-        }
-
-        private void Initialize(ColorIDs colorId, Vector2Int pos)
-        {
-            Position = pos;
-            _colorId = colorId;
-            PassengerColor.SetColor(DataManager.Instance.ColorContainer.GetColorById(colorId));
+            _passengerVisual.SetColor(DataManager.Instance.ColorContainer.GetColorById(data.stickmanColor));
         }
 
         public void Select()
@@ -44,20 +73,37 @@ namespace Runtime.Gameplay
         public void SetPassengerSelectable(bool state)
         {
             IsSelectable = state;
-            // TODO: Outline process
+            _passengerVisual.SetOutline(state);
+        }
+
+        public void StartPeeking()
+        {
+            VehicleManager.Instance.OnVehicleBoarded += onVehicleBoarded;
+        }
+
+        public void onVehicleBoarded()
+        {
+            if (Manager.CanBoardVehicle(this))
+            {
+                VehicleManager.Instance.OnVehicleBoarded -= onVehicleBoarded;
+                WaitingAreaManager.Instance._currentAvailableSlotCount++;
+                WaitingAreaManager.Instance.RemoveStickman(Data);
+                VehicleManager.Instance.CurrentVehicle.currentPassengers++;
+
+                transform.DOMove(VehicleManager.Instance.CurrentVehicle.transform.position, .5f).SetEase(Ease.Linear)
+                    .OnComplete(() =>
+                    {
+                        VehicleManager.Instance.CurrentVehicle.AddPassenger(.5f);
+                        Manager.PassengerPool.Release(this);
+                    }).SetLink(gameObject);
+            }
         }
     }
 
-    public interface ISelectable
-    {
-        bool IsSelectable {  get; }
-        void Select();
-    }
-
-    public struct PassengerColor
+    public struct PassengerVisual
     {
         private PassengerBase _base;
-        public PassengerColor(PassengerBase passenger)
+        public PassengerVisual(PassengerBase passenger)
         {
             _base = passenger;
         }
@@ -65,8 +111,13 @@ namespace Runtime.Gameplay
         public void SetColor(Color color) 
         {
             MaterialPropertyBlock block = new();
-            block.SetColor("_Color", color);
+            block.SetColor("_BaseColor", color);
             _base.Renderer.SetPropertyBlock(block);
+        }
+
+        public void SetOutline(bool isActive)
+        {
+            // TODO: Outline process
         }
     }
 }

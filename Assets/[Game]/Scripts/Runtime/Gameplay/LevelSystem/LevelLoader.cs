@@ -1,22 +1,47 @@
+using DG.Tweening;
+using Runtime.Core;
+using System;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Runtime.Gameplay
 {
-    public class LevelLoader : MonoBehaviour
+    public class LevelLoader : Singleton<LevelLoader>
     {
-        [SerializeField]public LevelData level; // TODO: get level container
+        public event Action OnLevelStartLoading;
+        public event Action OnLevelLoaded;
 
-        void Start()
+        public static LevelData CurrentLevelData;
+        private LevelManager LevelManager => LevelManager.Instance;
+
+        private void Start()
         {
-            LoadLevel(level);
+            LoadLevel();
         }
 
-        void LoadLevel(LevelData levelData)
+        private void InitializeLevel()
         {
-            BoardManager.Instance.Initialize(level);
-            PassengerManager.Instance.Initialize(level);
-            VehicleManager.Instance.Initialize(level);
-            WaitingAreaManager.Instance.Initialize(level);
+            BoardManager.Instance.Initialize();
+            PassengerManager.Instance.Initialize();
+            VehicleManager.Instance.Initialize();
+            WaitingAreaManager.Instance.Initialize();
+
+            DOVirtual.DelayedCall(.5f,()=> OnLevelLoaded?.Invoke());
+        }
+
+        public void LoadLevel() 
+        {
+            OnLevelStartLoading?.Invoke();
+
+            if (LevelManager.CurrentLevel - 1 > LevelManager.Levels.Count - 1)
+            {
+                int index = Random.Range(0, LevelManager.Instance.Levels.Count);
+                CurrentLevelData = LevelManager.Instance.Levels[index];
+            }
+            else
+                CurrentLevelData = LevelManager.Instance.Levels[LevelManager.CurrentLevel - 1];
+
+            InitializeLevel();
         }
     }
 }
