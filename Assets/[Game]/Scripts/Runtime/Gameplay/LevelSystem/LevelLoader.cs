@@ -6,7 +6,7 @@ using Random = UnityEngine.Random;
 
 namespace Runtime.Gameplay
 {
-    public class LevelLoader : MonoBehaviour
+    public class LevelLoader : Singleton<LevelLoader>
     {
         public event Action OnLevelStartLoading;
         public event Action OnLevelLoaded;
