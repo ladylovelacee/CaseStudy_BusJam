@@ -328,6 +328,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: ac9ee1ba3dbc2e043bf66e9c3a7928a6, type: 2}
   - {fileID: 11400000, guid: f9499fc46242e08479dabca22337a8f8, type: 2}
   - {fileID: 11400000, guid: 144076f279344aa4fb9cde19c8917dd8, type: 2}
+  - {fileID: 11400000, guid: 48be4dfb53e5819488620a259135190f, type: 2}
   LevelLoader: {fileID: 1855206223}
 --- !u!114 &169981369
 MonoBehaviour:
