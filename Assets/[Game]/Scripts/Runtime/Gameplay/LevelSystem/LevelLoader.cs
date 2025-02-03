@@ -1,7 +1,6 @@
 using DG.Tweening;
 using Runtime.Core;
 using System;
-using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace Runtime.Gameplay

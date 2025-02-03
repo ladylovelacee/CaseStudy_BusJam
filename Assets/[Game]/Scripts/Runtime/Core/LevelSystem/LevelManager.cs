@@ -57,5 +57,17 @@ namespace Runtime.Core
 
             OnLevelRestart?.Invoke();
         }
+
+        public void FinishLevel(bool isSuccess, float delay = 0)
+        {
+            if (!IsLevelStarted) return;
+            IsLevelStarted = false;
+
+            if (isSuccess)
+                CurrentLevel++;
+
+            GameplaySaveSystem.RemoveGameplayData();
+            this.Wait(delay, ()=> OnLevelEnd?.Invoke(isSuccess));
+        }
     }
 }
