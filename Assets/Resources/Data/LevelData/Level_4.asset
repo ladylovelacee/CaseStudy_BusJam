@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a77fc43faffeacb4daa55b950fa6f7aa, type: 3}
   m_Name: Level_4
   m_EditorClassIdentifier: 
-  duration: 80
+  duration: 30
   width: 3
   height: 3
   stickmen:
@@ -29,19 +29,19 @@ MonoBehaviour:
     worldPosition: {x: 0, y: 0, z: 0}
     stickmanColor: 2
   - position: {x: 2, y: 0}
-    worldPosition: {x: 0, y: 0, z: 0}
+    worldPosition: {x: 2, y: 0, z: 2}
     stickmanColor: 2
   - position: {x: 2, y: 1}
-    worldPosition: {x: 0, y: 0, z: 0}
+    worldPosition: {x: 0.75, y: 0, z: 2}
     stickmanColor: 2
   - position: {x: 1, y: 1}
-    worldPosition: {x: 0, y: 0, z: 0}
+    worldPosition: {x: -0.5, y: 0, z: 2}
     stickmanColor: 4
   - position: {x: 1, y: 2}
-    worldPosition: {x: 0, y: 0, z: 0}
+    worldPosition: {x: -1.75, y: 0, z: 2}
     stickmanColor: 4
   - position: {x: 2, y: 2}
-    worldPosition: {x: 0, y: 0, z: 0}
+    worldPosition: {x: -3, y: 0, z: 2}
     stickmanColor: 4
   obstacles: []
   busQueue:

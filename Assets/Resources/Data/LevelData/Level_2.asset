@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a77fc43faffeacb4daa55b950fa6f7aa, type: 3}
   m_Name: Level_2
   m_EditorClassIdentifier: 
-  duration: 80
+  duration: 20
   width: 2
   height: 3
   stickmen:
@@ -23,7 +23,7 @@ MonoBehaviour:
     worldPosition: {x: 0, y: 0, z: 0}
     stickmanColor: 2
   - position: {x: 0, y: 2}
-    worldPosition: {x: 0, y: 0, z: 0}
+    worldPosition: {x: -3, y: 0, z: 2}
     stickmanColor: 2
   - position: {x: 1, y: 0}
     worldPosition: {x: 0, y: 0, z: 0}
