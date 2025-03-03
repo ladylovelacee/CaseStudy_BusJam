@@ -138,7 +138,9 @@ namespace Runtime.Gameplay
         {
             JobHandle handle = Pathfinding.FindPath(new int2(GridManager.width, GridManager.height), new int2(startPos.x, startPos.y), new int2(targetPos.x, targetPos.y), GridManager.WalkableArea,out NativeList<int2> path);
             handle.Complete();
-            return path.Length == 0 ? false : true;
+            int pathLength = path.Length;
+            path.Dispose();
+            return pathLength == 0 ? false : true;
         }
         #endregion
 
